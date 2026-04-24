@@ -24,7 +24,6 @@
     .toast-message.show{opacity:1;}
     .toast-message.success{background:rgba(39,174,96,0.95);}
     .toast-message.warning{background:rgba(241,196,15,0.95);color:#1e4b63;}
-    .toast-message.error{background:rgba(199,66,63,0.95);}
 
     .confirm-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:10000;backdrop-filter:blur(4px);}
     .confirm-modal.hidden{display:none;}
@@ -52,6 +51,13 @@
     .input-field{width:100%;padding:12px 16px;font-size:15px;background:white;border:1.5px solid #d7e2e9;border-radius:20px;outline:none;}
     .input-field:focus{border-color:#2f7c9e;}
     .input-field.error{border-color:#c0392b;}
+    
+    /* 密码可见切换 */
+    .password-wrapper{position:relative;}
+    .password-wrapper .input-field{padding-right:50px;}
+    .toggle-password{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;font-size:18px;color:#7b98a8;padding:4px 8px;}
+    .toggle-password:hover{color:#1e4b63;}
+    
     .captcha-group{display:flex;gap:10px;align-items:center;}
     .captcha-input{flex:1;}
     .captcha-display{background:linear-gradient(135deg,#1e4b63,#2f7c9e);color:white;padding:12px 16px;border-radius:20px;font-size:20px;font-weight:700;letter-spacing:4px;text-align:center;min-width:100px;cursor:pointer;font-family:'Courier New',monospace;}
@@ -113,7 +119,6 @@
     .account-info{display:flex;flex-direction:column;gap:2px;}
     .account-name{font-weight:600;color:#0b2b3c;}
     .account-balance{font-size:13px;color:#1c6d4c;font-weight:600;margin-top:2px;}
-    .account-ip{font-size:11px;color:#5c7b8c;margin-top:2px;}
     .delete-btn{background:none;border:none;color:#c0392b;cursor:pointer;font-size:16px;}
     .edit-btn{background:none;border:none;color:#1e4b63;cursor:pointer;font-size:14px;margin-right:8px;}
     .address-manager{margin-bottom:16px;}
@@ -141,18 +146,17 @@
   </div>
   <div id="toast" class="toast-message"></div>
 
-  <!-- 确认弹窗 -->
   <div id="confirmModal" class="confirm-modal hidden">
     <div class="confirm-content">
       <button class="confirm-close" onclick="document.getElementById('confirmModal').classList.add('hidden');if(window._ct)clearInterval(window._ct);">✕</button>
       <div class="confirm-icon">⚠️</div>
-      <div class="confirm-title" id="confirmModalTitle">重要提醒</div>
+      <div class="confirm-title">重要提醒</div>
       <div class="confirm-warning-text">
-        <p id="confirmText1">即将跳转支付页面，请勿重复扫描二维码对同一个地址进行支付。</p>
-        <p id="confirmText2">为确保您的款项安全到账，支付前，请再次核对地址和区块链网络类型。</p>
-        <p id="confirmText3">如需再次充值，请前往充值页，创建新的订单！</p>
-        <p id="confirmText4"><span class="confirm-highlight">请认真核对货币类型，目前只接受USDT-TRC20和USDT-ERC20进行支付。</span></p>
-        <p id="confirmText5">如有任何疑问，请与我们联系。</p>
+        <p>即将跳转支付页面，请勿重复扫描二维码对同一个地址进行支付。</p>
+        <p>为确保您的款项安全到账，支付前，请再次核对地址和区块链网络类型。</p>
+        <p>如需再次充值，请前往充值页，创建新的订单！</p>
+        <p><span class="confirm-highlight">请认真核对货币类型，目前只接受USDT-TRC20和USDT-ERC20进行支付。</span></p>
+        <p>如有任何疑问，请与我们联系。</p>
       </div>
       <button class="confirm-btn" id="confirmOkBtn" disabled>我已仔细阅读上列信息并确认订单信息无误 (3)</button>
     </div>
@@ -165,41 +169,60 @@
       <button class="lang-btn" data-lang="en">English</button>
     </div>
   </div>
-  <div class="app-title"><h1 id="appTitle">自助充值中心</h1></div>
+  <div class="app-title"><h1>自助充值中心</h1></div>
 
   <!-- 登录面板 -->
   <div id="loginPanel" class="card">
     <div class="login-avatar"><span>🔐</span></div>
-    <div class="input-group"><label id="lblAccount">👤 账户</label><input type="text" id="loginUsername" class="input-field" placeholder="请输入账户" autocomplete="off"></div>
-    <div class="input-group"><label id="lblPassword">🔑 密码</label><input type="password" id="loginPassword" class="input-field" placeholder="请输入密码" autocomplete="off"></div>
-    <div class="input-group"><label id="lblCaptcha">🔢 验证码</label><div class="captcha-group"><input type="text" id="loginCaptcha" class="input-field captcha-input" placeholder="请输入验证码" maxlength="4"><div class="captcha-display" id="captchaDisplay">A3B8</div></div></div>
+    <div class="input-group">
+      <label>👤 账户</label>
+      <input type="text" id="loginUsername" class="input-field" placeholder="请输入账户" autocomplete="off">
+    </div>
+    <div class="input-group">
+      <label>🔑 密码</label>
+      <div class="password-wrapper">
+        <input type="password" id="loginPassword" class="input-field" placeholder="请输入密码" autocomplete="off">
+        <button type="button" class="toggle-password" data-target="loginPassword">👁️</button>
+      </div>
+    </div>
+    <div class="input-group">
+      <label>🔢 验证码</label>
+      <div class="captcha-group">
+        <input type="text" id="loginCaptcha" class="input-field captcha-input" placeholder="请输入验证码" maxlength="4" autocomplete="off">
+        <div class="captcha-display" id="captchaDisplay" title="点击刷新验证码">A3B8</div>
+      </div>
+    </div>
     <div id="loginError" class="error-msg"></div>
-    <button id="loginBtn" class="btn"><span>登录 · 进入充值</span></button>
+    <button id="loginBtn" class="btn">登录 · 进入充值</button>
   </div>
 
   <!-- 充值面板 -->
   <div id="rechargePanel" class="card hidden">
     <div class="user-header"><span class="welcome-tag" id="welcomeUser">-</span><button id="logoutBtn" class="logout-btn">🚪 退出</button></div>
-    <div class="balance-card"><div class="balance-label" id="balanceLabel">💰 我的余额</div><div class="balance-amount"><span id="balanceValue">0.00</span><small id="unitText">$</small></div></div>
-    <h2 id="rechargeTitle">⚡ 快速充值</h2>
+    <div class="balance-card"><div class="balance-label">💰 我的余额</div><div class="balance-amount"><span id="balanceValue">0.00</span><small>$</small></div></div>
+    <h2>⚡ 快速充值</h2>
     <div class="recharge-options" id="rechargeOptionsContainer"></div>
     <div class="custom-input-wrapper"><span>$</span><input type="number" id="customAmountInput" class="custom-amount" placeholder="其他金额" min="20" max="50000" step="0.01" inputmode="decimal"></div>
-    <div class="amount-hint" id="amountHint"></div>
-    <div class="network-section"><div class="network-title" id="networkTitle">🌐 选择网络 <span style="color:#c0392b;">*</span></div><div class="network-buttons"><button class="network-btn" data-network="TRC20">USDT-TRC20</button><button class="network-btn" data-network="ERC20">USDT-ERC20</button></div></div>
+    <div class="amount-hint">单笔限额 20 - 50,000</div>
+    <div class="network-section"><div class="network-title">🌐 选择网络 <span style="color:#c0392b;">*</span></div><div class="network-buttons"><button class="network-btn" data-network="TRC20">USDT-TRC20</button><button class="network-btn" data-network="ERC20">USDT-ERC20</button></div></div>
     <div id="rechargeError" class="error-msg"></div>
-    <div class="action-buttons"><button id="gotoConfirmBtn" class="btn"><span>✨ 提交</span></button><button id="resetFormBtn" class="btn btn-secondary"><span>🔄 重置</span></button></div>
-    <div style="margin-top:20px;"><div style="font-weight:600;color:#1e4b63;margin-bottom:10px;" id="historyTitle">📋 最近记录</div><ul id="historyList" class="history-list"><li class="empty-history">暂无记录</li></ul></div>
+    <div class="action-buttons"><button id="gotoConfirmBtn" class="btn">✨ 提交</button><button id="resetFormBtn" class="btn btn-secondary">🔄 重置</button></div>
+    <div style="margin-top:20px;"><div style="font-weight:600;color:#1e4b63;margin-bottom:10px;">📋 最近记录</div><ul id="historyList" class="history-list"><li class="empty-history">暂无记录</li></ul></div>
   </div>
 
   <!-- 确认页面 -->
   <div id="confirmPanel" class="card hidden">
-    <div style="display:flex;align-items:center;margin-bottom:14px;"><button id="backToRechargeBtn" style="background:none;border:none;font-size:22px;margin-right:10px;cursor:pointer;">←</button><h2 id="confirmTitle" style="margin:0;">确认充值</h2></div>
-    <div class="order-id-section"><span id="orderIdLabel">📋 订单号</span><span id="orderIdDisplay" style="font-weight:600;">-</span></div>
-    <div class="timer-warning"><span id="timeLimitMsg">⏳ 剩余支付时间</span><span class="countdown-timer" id="countdownDisplay">15:00</span></div>
+    <div style="display:flex;align-items:center;margin-bottom:14px;"><button id="backToRechargeBtn" style="background:none;border:none;font-size:22px;margin-right:10px;cursor:pointer;">←</button><h2 style="margin:0;">确认充值</h2></div>
+    <div class="order-id-section"><span>📋 订单号</span><span id="orderIdDisplay" style="font-weight:600;">-</span></div>
+    <div class="timer-warning"><span>⏳ 剩余支付时间</span><span class="countdown-timer" id="countdownDisplay">15:00</span></div>
     <div style="background:#eef3f8;border-radius:20px;padding:14px;"><span id="orderInfo">金额: $0 · 网络: 未选择</span></div>
-    <div class="address-card"><div class="address-header"><span id="rechargeAddressLabel">📦 充值地址</span><span id="networkTypeLabel">网络</span></div><div class="address-value-large" id="currentAddressDisplay">-</div><button class="copy-btn" id="copyAddressBtn" disabled><span>📋 </span><span id="copyAddressText">复制地址</span></button></div>
-    <div class="qr-placeholder"><div id="qrCodeDisplay" class="qr-code-container"><div class="qr-code-sim"></div></div><p style="margin-top:10px;color:#2c5b73;" id="scanTip">请扫描二维码或复制地址转账</p></div>
-    <div class="tips-container-bottom"><div class="tip-item"><div class="tip-icon">1</div><div class="tip-text" id="tip1"></div></div><div class="tip-item"><div class="tip-icon">2</div><div class="tip-text" id="tip2"></div></div><div class="tip-item"><div class="tip-icon">3</div><div class="tip-text" id="tip3"></div></div></div>
+    <div class="address-card"><div class="address-header"><span>📦 充值地址</span><span id="networkTypeLabel">网络</span></div><div class="address-value-large" id="currentAddressDisplay">-</div><button class="copy-btn" id="copyAddressBtn" disabled>📋 复制地址</button></div>
+    <div class="qr-placeholder"><div id="qrCodeDisplay" class="qr-code-container"><div class="qr-code-sim"></div></div><p style="margin-top:10px;color:#2c5b73;">请扫描二维码或复制地址转账</p></div>
+    <div class="tips-container-bottom">
+      <div class="tip-item"><div class="tip-icon">1</div><div>⏰ 请在15分钟内完成支付</div></div>
+      <div class="tip-item"><div class="tip-icon">2</div><div>🔄 每次充值地址随机生成</div></div>
+      <div class="tip-item"><div class="tip-icon">3</div><div>⏱️ 充值完成后，5-10分钟内到账</div></div>
+    </div>
   </div>
 
   <!-- 管理员面板 -->
@@ -207,10 +230,9 @@
     <div style="display:flex;align-items:center;margin-bottom:14px;"><button id="backFromAdminBtn" style="background:none;border:none;font-size:22px;margin-right:10px;cursor:pointer;">←</button><h2 style="margin:0;">管理员面板</h2></div>
     <div class="admin-panel">
       <div class="section-title">👥 账户管理</div>
-      <div style="display:flex;gap:10px;margin-bottom:16px;"><input type="text" id="newUsername" class="input-field" placeholder="用户名" style="flex:2;"><input type="text" id="newPassword" class="input-field" placeholder="密码" style="flex:2;"><button class="btn" id="addAccountBtn" style="flex:1;padding:12px;">添加</button></div>
+      <div style="display:flex;gap:10px;margin-bottom:16px;"><input type="text" id="newUsername" class="input-field" placeholder="用户名" style="flex:2;"><div class="password-wrapper" style="flex:2;"><input type="password" id="newPassword" class="input-field" placeholder="密码"><button type="button" class="toggle-password" data-target="newPassword">👁️</button></div><button class="btn" id="addAccountBtn" style="flex:1;padding:12px;">添加</button></div>
       <div id="accountList" class="account-list"></div>
       <div class="section-title">📦 地址与二维码管理</div>
-      <p class="note-text">以下地址从Supabase数据库加载，可上传/更换二维码</p>
       <div id="addressManager" class="address-manager"></div>
       <div class="section-title">📊 充值订单管理</div>
       <div id="adminOrderList"></div>
@@ -229,11 +251,11 @@
   const ADMIN_ACCOUNT = 'GUANLI001';
   const FIXED_AMOUNTS = [30, 50, 100, 200, 500];
   
-  let currentUser = null, userBalance = 0, currentLang = 'zh';
-  let selectedAmount = null, selectedNetwork = null, currentAddress = '', currentOrderId = '', currentCaptcha = '';
+  let currentUser = null, userBalance = 0, currentCaptcha = '';
+  let selectedAmount = null, selectedNetwork = null, currentAddress = '', currentOrderId = '';
   let confirmTimer = null, countdownTimer = null, pendingRecharge = null;
   let addressPool = { TRC20: [], ERC20: [] };
-  let qrCodes = {}, allOrders = [], accountsList = {}, loginRecords = {};
+  let qrCodes = {}, allOrders = [], accountsList = {};
 
   const $ = id => document.getElementById(id);
   const showToast = (m, type='info') => {
@@ -242,183 +264,295 @@
   };
   const showLoading = (show, text) => { $('loadingOverlay').classList.toggle('hidden', !show); if(text) $('loadingText').textContent = text; };
   const formatMoney = v => v.toFixed(2);
-  const updateBalance = () => { $('balanceValue').textContent = formatMoney(userBalance); };
 
-  async function sha256(msg) { const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg)); return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join(''); }
-  function refreshCaptcha() { const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789'; currentCaptcha = Array.from({length:4},()=>c[Math.floor(Math.random()*c.length)]).join(''); $('captchaDisplay').textContent = currentCaptcha; }
+  // SHA-256
+  async function sha256(msg) {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
+    return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+
+  // 验证码
+  function refreshCaptcha() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    currentCaptcha = Array.from({length:4}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+    $('captchaDisplay').textContent = currentCaptcha;
+  }
   $('captchaDisplay').addEventListener('click', refreshCaptcha);
-  function generateOrderId() { return 'RC' + Date.now().toString(36).toUpperCase(); }
-  function generateAddress() { return selectedNetwork && addressPool[selectedNetwork]?.length ? addressPool[selectedNetwork][Math.floor(Math.random()*addressPool[selectedNetwork].length)] : null; }
+  refreshCaptcha();
+
+  // 密码可见切换
+  document.querySelectorAll('.toggle-password').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+      }
+    });
+  });
 
   // Supabase 数据操作
-  const loadAddressPool = async () => { const { data } = await supabase.from('recharge_addresses').select('*'); if(data){ addressPool = {TRC20:[],ERC20:[]}; data.forEach(i=>{ if(addressPool[i.network]) addressPool[i.network].push(i.address); }); } };
-  const loadQRCodes = async () => { const { data } = await supabase.from('qr_codes').select('*'); if(data){ qrCodes={}; data.forEach(i=>{ qrCodes[i.address]=i.qr_image; }); } };
-  const loadAllOrders = async () => { const { data } = await supabase.from('recharge_orders').select('*').order('created_at',{ascending:false}); if(data) allOrders = data; };
-  const loadAccountsList = async () => { const { data } = await supabase.from('accounts').select('*'); if(data){ accountsList={}; data.forEach(i=>{ accountsList[i.username]={password:i.password,balance:i.balance}; }); } };
-  const getUserBalance = async (username) => { const { data } = await supabase.from('accounts').select('balance').eq('username',username).limit(1); const d = data&&data.length>0?data[0]:null; return d?.balance||0; };
-  const verifyLogin = async (username, password) => { const { data } = await supabase.from('accounts').select('password').eq('username',username).limit(1); const d = data&&data.length>0?data[0]:null; if(!d) return false; return d.password === await sha256(password); };
-  const createOrder = async (order) => { await supabase.from('recharge_orders').insert(order); };
-  const confirmOrder = async (orderId) => {
-    const order = allOrders.find(o=>o.order_id===orderId); if(!order||order.status!=='pending') return;
-    const { data:acc } = await supabase.from('accounts').select('balance').eq('username',order.username).limit(1);
-    const newBalance = ((acc&&acc[0]?.balance)||0) + parseFloat(order.amount);
-    await supabase.from('recharge_orders').update({status:'success',confirmed_at:new Date()}).eq('order_id',orderId);
-    await supabase.from('accounts').update({balance:newBalance}).eq('username',order.username);
-    if(currentUser===order.username){ userBalance=newBalance; updateBalance(); }
-    await loadAllOrders(); renderAllOrders(); renderHistory(); showToast('订单已确认','success');
+  const loadAddressPool = async () => {
+    const { data } = await supabase.from('recharge_addresses').select('*');
+    if (data) { addressPool = {TRC20:[],ERC20:[]}; data.forEach(i => { if (addressPool[i.network]) addressPool[i.network].push(i.address); }); }
   };
-  const deleteOrder = async (orderId) => { await supabase.from('recharge_orders').delete().eq('order_id',orderId); await loadAllOrders(); renderAllOrders(); renderHistory(); showToast('订单已删除','success'); };
-  const updateUserBalance = async (username, newBalance) => { await supabase.from('accounts').update({balance:newBalance}).eq('username',username); if(currentUser===username){ userBalance=newBalance; updateBalance(); } await loadAccountsList(); renderAccountsList(); showToast('余额已更新','success'); };
-  const addAccount = async (username, password) => { const hp = await sha256(password); const { error } = await supabase.from('accounts').insert({username,password:hp,balance:0}); if(error){ showToast('添加失败','warning'); return false; } await loadAccountsList(); renderAccountsList(); showToast('账户已添加','success'); return true; };
-  const deleteAccount = async (username) => { await supabase.from('accounts').delete().eq('username',username); await loadAccountsList(); renderAccountsList(); showToast('账户已删除','success'); };
-  const saveQRCode = async (address, qrImage) => { const { data } = await supabase.from('qr_codes').select('*').eq('address',address).limit(1); if(data&&data.length>0) await supabase.from('qr_codes').update({qr_image:qrImage}).eq('address',address); else await supabase.from('qr_codes').insert({address,qr_image:qrImage}); await loadQRCodes(); renderAddressManager(); showToast('二维码已保存','success'); };
+  const loadQRCodes = async () => {
+    const { data } = await supabase.from('qr_codes').select('*');
+    if (data) { qrCodes = {}; data.forEach(i => { qrCodes[i.address] = i.qr_image; }); }
+  };
+  const loadAllOrders = async () => {
+    const { data } = await supabase.from('recharge_orders').select('*').order('created_at', {ascending:false});
+    if (data) allOrders = data;
+  };
+  const loadAccountsList = async () => {
+    const { data } = await supabase.from('accounts').select('*');
+    if (data) { accountsList = {}; data.forEach(i => { accountsList[i.username] = {password:i.password, balance:i.balance}; }); }
+  };
 
-  // 渲染函数
+  // 登录验证
+  const verifyLogin = async (username, password) => {
+    const { data, error } = await supabase.from('accounts').select('password').eq('username', username).limit(1);
+    if (error) { console.error('查询错误:', error); return false; }
+    const userData = data && data.length > 0 ? data[0] : null;
+    if (!userData) return false;
+    return userData.password === await sha256(password);
+  };
+
+  // 生成地址
+  function generateAddress() {
+    return selectedNetwork && addressPool[selectedNetwork]?.length ? 
+      addressPool[selectedNetwork][Math.floor(Math.random() * addressPool[selectedNetwork].length)] : null;
+  }
+
+  // 渲染
   const renderHistory = () => {
-    const userOrders = allOrders.filter(o=>o.username===currentUser).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
-    if(!userOrders.length){ $('historyList').innerHTML='<li class="empty-history">暂无记录</li>'; return; }
-    $('historyList').innerHTML = userOrders.slice(0,6).map(o=>{
-      const d=new Date(o.created_at), ts=`${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+    const userOrders = allOrders.filter(o => o.username === currentUser).sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+    if (!userOrders.length) { $('historyList').innerHTML = '<li class="empty-history">暂无记录</li>'; return; }
+    $('historyList').innerHTML = userOrders.slice(0,6).map(o => {
+      const d = new Date(o.created_at), ts = `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
       return `<li class="history-item"><span>${ts}</span><span class="history-amount">+$${formatMoney(o.amount)}</span></li>`;
     }).join('');
   };
+
   const renderAmounts = () => {
-    $('rechargeOptionsContainer').innerHTML = FIXED_AMOUNTS.map(a=>`<div class="recharge-item ${selectedAmount===a?'selected':''}" data-amount="${a}"><div class="recharge-amount">$${a}</div></div>`).join('');
-    document.querySelectorAll('.recharge-item').forEach(el=>{ el.addEventListener('click',()=>{ selectedAmount=parseFloat(el.dataset.amount); document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected')); el.classList.add('selected'); $('customAmountInput').value=''; }); });
+    $('rechargeOptionsContainer').innerHTML = FIXED_AMOUNTS.map(a => 
+      `<div class="recharge-item ${selectedAmount===a?'selected':''}" data-amount="${a}"><div class="recharge-amount">$${a}</div></div>`
+    ).join('');
+    document.querySelectorAll('.recharge-item').forEach(el => {
+      el.addEventListener('click', () => {
+        selectedAmount = parseFloat(el.dataset.amount);
+        document.querySelectorAll('.recharge-item').forEach(e => e.classList.remove('selected'));
+        el.classList.add('selected');
+        $('customAmountInput').value = '';
+      });
+    });
   };
-  const getAmount = () => $('customAmountInput').value.trim() ? parseFloat($('customAmountInput').value)||0 : (selectedAmount||0);
+
   const renderAccountsList = () => {
-    $('accountList').innerHTML = Object.entries(accountsList).map(([n,d])=>`<div class="account-item"><div class="account-info"><span class="account-name">${n}</span><span class="account-balance">余额: $${formatMoney(d.balance)}</span></div><div class="action-cell"><button class="edit-btn" data-user="${n}">💰</button>${n!==ADMIN_ACCOUNT?`<button class="delete-btn" data-user="${n}">🗑️</button>`:'<span style="color:#999;">Admin</span>'}</div></div>`).join('');
-    document.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click',()=>{ const nb=prompt('编辑余额: '+b.dataset.user, accountsList[b.dataset.user]?.balance||0); if(nb&&!isNaN(nb)) updateUserBalance(b.dataset.user, parseFloat(nb)); }));
-    document.querySelectorAll('.delete-btn').forEach(b=>b.addEventListener('click',()=>{ if(confirm('确定删除用户 '+b.dataset.user+'?')) deleteAccount(b.dataset.user); }));
+    $('accountList').innerHTML = Object.entries(accountsList).map(([n, d]) => 
+      `<div class="account-item"><div class="account-info"><span class="account-name">${n}</span><span class="account-balance">余额: $${formatMoney(d.balance)}</span></div><div class="action-cell"><button class="edit-btn" data-user="${n}">💰</button>${n !== ADMIN_ACCOUNT ? `<button class="delete-btn" data-user="${n}">🗑️</button>` : '<span style="color:#999;">Admin</span>'}</div></div>`
+    ).join('');
+    document.querySelectorAll('.edit-btn').forEach(b => b.addEventListener('click', () => {
+      const nb = prompt('编辑余额: ' + b.dataset.user, accountsList[b.dataset.user]?.balance || 0);
+      if (nb && !isNaN(nb)) {
+        supabase.from('accounts').update({balance: parseFloat(nb)}).eq('username', b.dataset.user).then(() => {
+          loadAccountsList().then(() => renderAccountsList());
+          showToast('余额已更新', 'success');
+        });
+      }
+    }));
+    document.querySelectorAll('.delete-btn').forEach(b => b.addEventListener('click', () => {
+      if (confirm('确定删除用户 ' + b.dataset.user + '?')) {
+        supabase.from('accounts').delete().eq('username', b.dataset.user).then(() => {
+          loadAccountsList().then(() => renderAccountsList());
+          showToast('账户已删除', 'success');
+        });
+      }
+    }));
   };
+
   const renderAddressManager = () => {
-    $('addressManager').innerHTML = Object.entries(addressPool).map(([net,addrs])=>addrs.map(addr=>`<div class="address-item"><div class="address-network">${net}</div><div class="address-full">${addr}</div><div class="address-actions"><button class="upload-qr-btn" data-addr="${addr}">${qrCodes[addr]?'更换二维码':'上传二维码'}</button>${qrCodes[addr]?' ✓':''}</div></div>`).join('')).join('');
-    document.querySelectorAll('.upload-qr-btn').forEach(b=>b.addEventListener('click',()=>{ const i=document.createElement('input'); i.type='file'; i.accept='image/*'; i.onchange=e=>{ const f=e.target.files[0]; if(f){ const r=new FileReader(); r.onload=ev=>saveQRCode(b.dataset.addr, ev.target.result); r.readAsDataURL(f); } }; i.click(); }));
+    $('addressManager').innerHTML = Object.entries(addressPool).map(([net, addrs]) => 
+      addrs.map(addr => `<div class="address-item"><div class="address-network">${net}</div><div class="address-full">${addr}</div><div class="address-actions"><button class="upload-qr-btn" data-addr="${addr}">${qrCodes[addr]?'更换二维码':'上传二维码'}</button>${qrCodes[addr]?' ✓':''}</div></div>`).join('')
+    ).join('');
+    document.querySelectorAll('.upload-qr-btn').forEach(b => b.addEventListener('click', () => {
+      const i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*';
+      i.onchange = e => {
+        const f = e.target.files[0];
+        if (f) {
+          const r = new FileReader();
+          r.onload = async ev => {
+            const img = ev.target.result;
+            const addr = b.dataset.addr;
+            const { data } = await supabase.from('qr_codes').select('*').eq('address', addr).limit(1);
+            if (data && data.length > 0) {
+              await supabase.from('qr_codes').update({qr_image: img}).eq('address', addr);
+            } else {
+              await supabase.from('qr_codes').insert({address: addr, qr_image: img});
+            }
+            await loadQRCodes();
+            renderAddressManager();
+            showToast('二维码已保存', 'success');
+          };
+          r.readAsDataURL(f);
+        }
+      };
+      i.click();
+    }));
   };
+
   const renderAllOrders = () => {
-    if(!allOrders.length){ $('adminOrderList').innerHTML='<p class="empty-history">暂无订单</p>'; return; }
-    $('adminOrderList').innerHTML = allOrders.map(o=>{
-      const d=new Date(o.created_at), ts=`${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
+    if (!allOrders.length) { $('adminOrderList').innerHTML = '<p class="empty-history">暂无订单</p>'; return; }
+    $('adminOrderList').innerHTML = allOrders.map(o => {
+      const d = new Date(o.created_at), ts = `${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}`;
       return `<div class="admin-history-item"><div class="admin-history-header"><span class="admin-history-user">${o.username}</span><span class="admin-history-amount">+$${formatMoney(o.amount)}</span></div><div style="color:#5c7b8c;margin-bottom:4px;">${o.order_id} · ${o.network}</div><div style="display:flex;justify-content:space-between;"><span class="status-badge ${o.status}">${o.status==='success'?'已到账':'待确认'}</span><div>${o.status==='pending'?`<button class="upload-qr-btn" data-order="${o.order_id}" style="background:#27ae60;margin-right:8px;">确认到账</button>`:''}<button class="delete-btn" data-order="${o.order_id}">🗑️</button></div></div></div>`;
     }).join('');
-    document.querySelectorAll('[data-order]').forEach(b=>{ if(b.textContent.includes('确认')) b.addEventListener('click',()=>confirmOrder(b.dataset.order)); else b.addEventListener('click',()=>deleteOrder(b.dataset.order)); });
+    document.querySelectorAll('[data-order]').forEach(b => {
+      if (b.textContent.includes('确认')) {
+        b.addEventListener('click', async () => {
+          const order = allOrders.find(o => o.order_id === b.dataset.order);
+          if (order) {
+            await supabase.from('recharge_orders').update({status:'success', confirmed_at: new Date()}).eq('order_id', order.order_id);
+            const { data: acc } = await supabase.from('accounts').select('balance').eq('username', order.username).limit(1);
+            const newBalance = ((acc && acc[0]?.balance) || 0) + parseFloat(order.amount);
+            await supabase.from('accounts').update({balance: newBalance}).eq('username', order.username);
+            if (currentUser === order.username) { userBalance = newBalance; $('balanceValue').textContent = formatMoney(userBalance); }
+            await loadAllOrders(); renderAllOrders(); renderHistory();
+            showToast('订单已确认', 'success');
+          }
+        });
+      } else {
+        b.addEventListener('click', async () => {
+          await supabase.from('recharge_orders').delete().eq('order_id', b.dataset.order);
+          await loadAllOrders(); renderAllOrders(); renderHistory();
+          showToast('订单已删除', 'success');
+        });
+      }
+    });
   };
-  const updateAddressDisplay = () => {
-    if(!selectedNetwork){ $('currentAddressDisplay').textContent='请先选择网络'; $('networkTypeLabel').textContent='网络'; $('copyAddressBtn').disabled=true; return; }
-    currentAddress=generateAddress(); $('currentAddressDisplay').textContent=currentAddress; $('networkTypeLabel').textContent=selectedNetwork==='TRC20'?'TRC20 网络':'ERC20 网络'; $('copyAddressBtn').disabled=false;
-    $('qrCodeDisplay').innerHTML = qrCodes[currentAddress] ? `<img src="${qrCodes[currentAddress]}" style="width:100%;height:100%;object-fit:contain;">` : '<div class="qr-code-sim"></div>';
-  };
-  const stopCountdown = () => { if(countdownTimer){ clearInterval(countdownTimer); countdownTimer=null; } };
-  const startCountdown = () => { stopCountdown(); let sec=900; $('countdownDisplay').textContent='15:00'; countdownTimer=setInterval(()=>{ sec--; const m=Math.floor(sec/60),s=sec%60; $('countdownDisplay').textContent=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; $('countdownDisplay').style.color=sec<=300?'#c0392b':'#d35400'; if(sec<=0){ stopCountdown(); showToast('支付超时','warning'); $('confirmPanel').classList.add('hidden'); $('rechargePanel').classList.remove('hidden'); } },1000); };
 
   // 登录
-$('loginBtn').addEventListener('click', async () => {
+  const handleLogin = async () => {
     const u = $('loginUsername').value.trim();
     const p = $('loginPassword').value;
     const c = $('loginCaptcha').value.trim();
     
     ['loginUsername','loginPassword','loginCaptcha'].forEach(id => $(id).classList.remove('error'));
     
-    if(!u){ $('loginUsername').classList.add('error'); $('loginError').textContent='请输入账户'; return; }
-    if(!p){ $('loginPassword').classList.add('error'); $('loginError').textContent='请输入密码'; return; }
-    if(!c){ $('loginCaptcha').classList.add('error'); $('loginError').textContent='请输入验证码'; return; }
-    if(c.toUpperCase() !== currentCaptcha.toUpperCase()){ 
-      $('loginCaptcha').classList.add('error'); 
-      $('loginError').textContent='验证码错误'; 
-      refreshCaptcha(); $('loginCaptcha').value = ''; return; 
+    if (!u) { $('loginUsername').classList.add('error'); $('loginError').textContent = '请输入账户'; return; }
+    if (!p) { $('loginPassword').classList.add('error'); $('loginError').textContent = '请输入密码'; return; }
+    if (!c) { $('loginCaptcha').classList.add('error'); $('loginError').textContent = '请输入验证码'; return; }
+    if (c.toUpperCase() !== currentCaptcha.toUpperCase()) {
+      $('loginCaptcha').classList.add('error'); $('loginError').textContent = '验证码错误';
+      refreshCaptcha(); $('loginCaptcha').value = ''; return;
     }
     
     showLoading(true, '正在验证...');
     $('loginError').textContent = '';
     
-    try {
-      // 🔧 关键修复：使用 .limit(1) 代替 .single()
-      const { data, error } = await supabase
-        .from('accounts')
-        .select('password, balance')
-        .eq('username', u)
-        .limit(1);
-      
-      if(error){ 
-        console.error('数据库错误:', error);
-        showToast('系统错误', 'error'); 
-        showLoading(false); return; 
-      }
-      
-      const userData = data && data.length > 0 ? data[0] : null;
-      
-      if(!userData){ 
-        $('loginError').textContent='账户或密码错误'; 
-        showLoading(false); return; 
-      }
-      
-      // SHA-256 哈希对比
-      const hashedInput = await sha256(p);
-      
-      if(hashedInput !== userData.password){ 
-        $('loginError').textContent='账户或密码错误'; 
-        showLoading(false); return; 
-      }
-      
-      // 登录成功
-      currentUser = u;
-      userBalance = userData.balance || 0;
-      $('welcomeUser').textContent = u;
-      $('balanceValue').textContent = userBalance.toFixed(2);
-      
-      $('loginPanel').classList.add('hidden');
-      $('rechargePanel').classList.remove('hidden');
-      $('loginUsername').value = ''; 
-      $('loginPassword').value = ''; 
-      $('loginCaptcha').value = '';
-      $('adminLink').style.display = (u === 'GUANLI001') ? 'block' : 'none';
-      refreshCaptcha();
-      renderHistory();
-      renderAmounts();
-      showLoading(false);
-      showToast('登录成功', 'success');
-      
-    } catch(e) {
-      console.error('登录异常:', e);
-      $('loginError').textContent = '系统异常: ' + e.message;
-      showLoading(false);
+    const isValid = await verifyLogin(u, p);
+    
+    if (!isValid) {
+      $('loginError').textContent = '账户或密码错误';
+      refreshCaptcha(); $('loginCaptcha').value = ''; showLoading(false); return;
     }
-});
+    
+    currentUser = u; $('welcomeUser').textContent = u;
+    
+    showLoading(true, '正在加载数据...');
+    const [balance] = await Promise.all([
+      (async () => { const { data } = await supabase.from('accounts').select('balance').eq('username', u).limit(1); return (data && data[0]?.balance) || 0; })(),
+      loadAllOrders(), loadAddressPool(), loadQRCodes()
+    ]);
+    userBalance = balance;
+    $('balanceValue').textContent = formatMoney(userBalance);
+    renderHistory(); renderAmounts();
+    selectedAmount = null; selectedNetwork = null; $('customAmountInput').value = '';
+    $('adminLink').style.display = (u === ADMIN_ACCOUNT) ? 'block' : 'none';
+    $('loginPanel').classList.add('hidden'); $('rechargePanel').classList.remove('hidden');
+    $('loginUsername').value = ''; $('loginPassword').value = ''; $('loginCaptcha').value = ''; refreshCaptcha();
+    showLoading(false);
+  };
 
-  // 事件绑定
+  // 事件
   $('loginBtn').addEventListener('click', handleLogin);
-  ['loginPassword','loginCaptcha'].forEach(id=>$(id).addEventListener('keypress',e=>{if(e.key==='Enter')handleLogin();}));
-  $('logoutBtn').addEventListener('click',()=>{ currentUser=null; stopCountdown(); $('loginPanel').classList.remove('hidden'); $('rechargePanel').classList.add('hidden'); $('confirmPanel').classList.add('hidden'); $('adminPanel').classList.add('hidden'); $('adminLink').style.display='none'; refreshCaptcha(); });
-  $('gotoConfirmBtn').addEventListener('click',()=>{
-    const a=getAmount(); if(a<=0) return $('rechargeError').textContent='请选择或输入金额'; if(a<20) return $('rechargeError').textContent='最低充值 $20'; if(!selectedNetwork) return $('rechargeError').textContent='请选择网络类型';
-    pendingRecharge={amount:a,network:selectedNetwork};
-    $('confirmModal').classList.remove('hidden'); $('confirmOkBtn').disabled=true; $('confirmOkBtn').textContent='我已仔细阅读上列信息并确认订单信息无误 (3)';
-    let count=3; if(confirmTimer) clearInterval(confirmTimer);
-    confirmTimer=setInterval(()=>{ count--; $('confirmOkBtn').textContent=`我已仔细阅读上列信息并确认订单信息无误 (${count})`; if(count<=0){ clearInterval(confirmTimer); $('confirmOkBtn').disabled=false; $('confirmOkBtn').textContent='我已仔细阅读上列信息并确认订单信息无误'; } },1000);
+  ['loginPassword','loginCaptcha'].forEach(id => $(id).addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); }));
+  $('logoutBtn').addEventListener('click', () => {
+    currentUser = null; if (countdownTimer) clearInterval(countdownTimer);
+    $('loginPanel').classList.remove('hidden'); $('rechargePanel').classList.add('hidden');
+    $('confirmPanel').classList.add('hidden'); $('adminPanel').classList.add('hidden');
+    $('adminLink').style.display = 'none'; refreshCaptcha();
   });
-  $('confirmOkBtn').addEventListener('click', async ()=>{
-    $('confirmModal').classList.add('hidden'); if(confirmTimer) clearInterval(confirmTimer); if(!pendingRecharge) return;
-    const {amount,network}=pendingRecharge; selectedNetwork=network;
-    currentOrderId=generateOrderId(); $('orderIdDisplay').textContent=currentOrderId; updateAddressDisplay();
-    $('orderInfo').textContent=`金额: $${amount.toFixed(2)} · 网络: ${network}`;
-    $('rechargePanel').classList.add('hidden'); $('confirmPanel').classList.remove('hidden'); startCountdown();
-    await createOrder({order_id:currentOrderId,username:currentUser,amount,network,address:currentAddress,status:'pending',created_at:new Date()});
-    await loadAllOrders(); renderHistory(); pendingRecharge=null;
+
+  $('gotoConfirmBtn').addEventListener('click', () => {
+    const a = $('customAmountInput').value ? parseFloat($('customAmountInput').value) : (selectedAmount || 0);
+    if (a <= 0) return $('rechargeError').textContent = '请选择或输入金额';
+    if (a < 20) return $('rechargeError').textContent = '最低充值 $20';
+    if (!selectedNetwork) return $('rechargeError').textContent = '请选择网络类型';
+    $('rechargeError').textContent = '';
+    pendingRecharge = {amount: a, network: selectedNetwork};
+    $('confirmModal').classList.remove('hidden'); $('confirmOkBtn').disabled = true;
+    $('confirmOkBtn').textContent = '我已仔细阅读上列信息并确认订单信息无误 (3)';
+    let count = 3; if (confirmTimer) clearInterval(confirmTimer);
+    confirmTimer = setInterval(() => {
+      count--; $('confirmOkBtn').textContent = `我已仔细阅读上列信息并确认订单信息无误 (${count})`;
+      if (count <= 0) { clearInterval(confirmTimer); $('confirmOkBtn').disabled = false; $('confirmOkBtn').textContent = '我已仔细阅读上列信息并确认订单信息无误'; }
+    }, 1000);
   });
-  $('resetFormBtn').addEventListener('click',()=>{ selectedAmount=null; selectedNetwork=null; $('customAmountInput').value=''; document.querySelectorAll('.network-btn').forEach(b=>b.classList.remove('active')); document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected')); $('rechargeError').textContent=''; });
-  $('backToRechargeBtn').addEventListener('click',()=>{ stopCountdown(); $('confirmPanel').classList.add('hidden'); $('rechargePanel').classList.remove('hidden'); });
-  $('copyAddressBtn').addEventListener('click', async ()=>{ if(!currentAddress) return; try{ await navigator.clipboard.writeText(currentAddress); showToast('已复制！','success'); }catch(e){ showToast('复制成功','success'); } });
-  document.querySelectorAll('.network-btn').forEach(b=>b.addEventListener('click',()=>{ document.querySelectorAll('.network-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); selectedNetwork=b.dataset.network; }));
-  $('customAmountInput').addEventListener('input',()=>{ let v=parseFloat($('customAmountInput').value); if(v>50000) $('customAmountInput').value=50000; if($('customAmountInput').value){ document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected')); selectedAmount=null; } });
-  document.querySelectorAll('.lang-btn').forEach(b=>b.addEventListener('click',()=>{ currentLang=b.dataset.lang; document.querySelectorAll('.lang-btn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }));
-  $('adminLink').addEventListener('click', async ()=>{ showLoading(true,'正在加载管理数据...'); await Promise.all([loadAccountsList(),loadAddressPool(),loadQRCodes(),loadAllOrders()]); renderAccountsList(); renderAddressManager(); renderAllOrders(); $('rechargePanel').classList.add('hidden'); $('adminPanel').classList.remove('hidden'); showLoading(false); });
-  $('backFromAdminBtn').addEventListener('click',()=>{ $('adminPanel').classList.add('hidden'); $('rechargePanel').classList.remove('hidden'); });
-  $('addAccountBtn').addEventListener('click', async ()=>{ const u=$('newUsername').value.trim(), p=$('newPassword').value; if(!u||!p) return showToast('请输入用户名和密码','warning'); if(await addAccount(u,p)){ $('newUsername').value=''; $('newPassword').value=''; } });
+
+  $('confirmOkBtn').addEventListener('click', async () => {
+    $('confirmModal').classList.add('hidden'); if (confirmTimer) clearInterval(confirmTimer);
+    if (!pendingRecharge) return;
+    const {amount, network} = pendingRecharge; selectedNetwork = network;
+    currentOrderId = 'RC' + Date.now().toString(36).toUpperCase(); $('orderIdDisplay').textContent = currentOrderId;
+    currentAddress = generateAddress(); $('currentAddressDisplay').textContent = currentAddress;
+    $('networkTypeLabel').textContent = selectedNetwork === 'TRC20' ? 'TRC20 网络' : 'ERC20 网络';
+    $('copyAddressBtn').disabled = false;
+    $('orderInfo').textContent = `金额: $${amount.toFixed(2)} · 网络: ${network}`;
+    $('rechargePanel').classList.add('hidden'); $('confirmPanel').classList.remove('hidden');
+    let sec = 900; if (countdownTimer) clearInterval(countdownTimer);
+    countdownTimer = setInterval(() => {
+      sec--; const m = Math.floor(sec/60), s = sec%60;
+      $('countdownDisplay').textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+      if (sec <= 0) { clearInterval(countdownTimer); showToast('支付超时', 'warning'); $('confirmPanel').classList.add('hidden'); $('rechargePanel').classList.remove('hidden'); }
+    }, 1000);
+    await supabase.from('recharge_orders').insert({order_id: currentOrderId, username: currentUser, amount, network, address: currentAddress, status: 'pending', created_at: new Date()});
+    await loadAllOrders(); renderHistory(); pendingRecharge = null;
+  });
+
+  $('resetFormBtn').addEventListener('click', () => {
+    selectedAmount = null; selectedNetwork = null; $('customAmountInput').value = '';
+    document.querySelectorAll('.network-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.recharge-item').forEach(e => e.classList.remove('selected'));
+  });
+  $('backToRechargeBtn').addEventListener('click', () => { if (countdownTimer) clearInterval(countdownTimer); $('confirmPanel').classList.add('hidden'); $('rechargePanel').classList.remove('hidden'); });
+  $('copyAddressBtn').addEventListener('click', async () => { if (!currentAddress) return; try { await navigator.clipboard.writeText(currentAddress); showToast('已复制！', 'success'); } catch(e) { showToast('复制成功', 'success'); } });
+  document.querySelectorAll('.network-btn').forEach(b => b.addEventListener('click', () => { document.querySelectorAll('.network-btn').forEach(x => x.classList.remove('active')); b.classList.add('active'); selectedNetwork = b.dataset.network; }));
+  $('customAmountInput').addEventListener('input', () => { if ($('customAmountInput').value) { document.querySelectorAll('.recharge-item').forEach(e => e.classList.remove('selected')); selectedAmount = null; } });
+
+  // 管理员
+  $('adminLink').addEventListener('click', async () => {
+    showLoading(true); await Promise.all([loadAccountsList(), loadAddressPool(), loadQRCodes(), loadAllOrders()]);
+    renderAccountsList(); renderAddressManager(); renderAllOrders();
+    $('rechargePanel').classList.add('hidden'); $('adminPanel').classList.remove('hidden'); showLoading(false);
+  });
+  $('backFromAdminBtn').addEventListener('click', () => { $('adminPanel').classList.add('hidden'); $('rechargePanel').classList.remove('hidden'); });
+  $('addAccountBtn').addEventListener('click', async () => {
+    const u = $('newUsername').value.trim(), p = $('newPassword').value;
+    if (!u || !p) return showToast('请输入用户名和密码', 'warning');
+    const hp = await sha256(p);
+    const { error } = await supabase.from('accounts').insert({username: u, password: hp, balance: 0});
+    if (error) return showToast('添加失败，用户名可能已存在', 'warning');
+    await loadAccountsList(); renderAccountsList();
+    $('newUsername').value = ''; $('newPassword').value = ''; showToast('账户已添加', 'success');
+  });
 
   // 初始化
   refreshCaptcha(); renderAmounts();
-  loadAddressPool().catch(()=>{}); loadQRCodes().catch(()=>{});
+  loadAddressPool().catch(() => {}); loadQRCodes().catch(() => {});
 })();
 </script>
 </body>
