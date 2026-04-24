@@ -313,27 +313,78 @@
   const startCountdown = () => { stopCountdown(); let sec=900; $('countdownDisplay').textContent='15:00'; countdownTimer=setInterval(()=>{ sec--; const m=Math.floor(sec/60),s=sec%60; $('countdownDisplay').textContent=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`; $('countdownDisplay').style.color=sec<=300?'#c0392b':'#d35400'; if(sec<=0){ stopCountdown(); showToast('支付超时','warning'); $('confirmPanel').classList.add('hidden'); $('rechargePanel').classList.remove('hidden'); } },1000); };
 
   // 登录
-  const handleLogin = async () => {
-    const u=$('loginUsername').value.trim(), p=$('loginPassword').value, c=$('loginCaptcha').value.trim();
-    ['loginUsername','loginPassword','loginCaptcha'].forEach(id=>$(id).classList.remove('error'));
+$('loginBtn').addEventListener('click', async () => {
+    const u = $('loginUsername').value.trim();
+    const p = $('loginPassword').value;
+    const c = $('loginCaptcha').value.trim();
+    
+    ['loginUsername','loginPassword','loginCaptcha'].forEach(id => $(id).classList.remove('error'));
+    
     if(!u){ $('loginUsername').classList.add('error'); $('loginError').textContent='请输入账户'; return; }
     if(!p){ $('loginPassword').classList.add('error'); $('loginError').textContent='请输入密码'; return; }
     if(!c){ $('loginCaptcha').classList.add('error'); $('loginError').textContent='请输入验证码'; return; }
-    if(c.toUpperCase()!==currentCaptcha.toUpperCase()){ $('loginCaptcha').classList.add('error'); $('loginError').textContent='验证码错误'; refreshCaptcha(); $('loginCaptcha').value=''; return; }
-    showLoading(true,'正在验证...');
-    const isValid = await verifyLogin(u, p);
-    if(!isValid){ $('loginError').textContent='账户或密码错误'; refreshCaptcha(); $('loginCaptcha').value=''; showLoading(false); return; }
-    currentUser=u; $('welcomeUser').textContent=u;
-    showLoading(true,'正在加载数据...');
-    const [balance] = await Promise.all([getUserBalance(u), loadAllOrders(), loadAddressPool(), loadQRCodes()]);
-    userBalance = balance;
-    updateBalance(); renderHistory(); renderAmounts();
-    selectedAmount=null; selectedNetwork=null; $('customAmountInput').value='';
-    $('adminLink').style.display = (u===ADMIN_ACCOUNT)?'block':'none';
-    $('loginPanel').classList.add('hidden'); $('rechargePanel').classList.remove('hidden');
-    $('loginUsername').value=''; $('loginPassword').value=''; $('loginCaptcha').value=''; refreshCaptcha();
-    showLoading(false);
-  };
+    if(c.toUpperCase() !== currentCaptcha.toUpperCase()){ 
+      $('loginCaptcha').classList.add('error'); 
+      $('loginError').textContent='验证码错误'; 
+      refreshCaptcha(); $('loginCaptcha').value = ''; return; 
+    }
+    
+    showLoading(true, '正在验证...');
+    $('loginError').textContent = '';
+    
+    try {
+      // 🔧 关键修复：使用 .limit(1) 代替 .single()
+      const { data, error } = await supabase
+        .from('accounts')
+        .select('password, balance')
+        .eq('username', u)
+        .limit(1);
+      
+      if(error){ 
+        console.error('数据库错误:', error);
+        showToast('系统错误', 'error'); 
+        showLoading(false); return; 
+      }
+      
+      const userData = data && data.length > 0 ? data[0] : null;
+      
+      if(!userData){ 
+        $('loginError').textContent='账户或密码错误'; 
+        showLoading(false); return; 
+      }
+      
+      // SHA-256 哈希对比
+      const hashedInput = await sha256(p);
+      
+      if(hashedInput !== userData.password){ 
+        $('loginError').textContent='账户或密码错误'; 
+        showLoading(false); return; 
+      }
+      
+      // 登录成功
+      currentUser = u;
+      userBalance = userData.balance || 0;
+      $('welcomeUser').textContent = u;
+      $('balanceValue').textContent = userBalance.toFixed(2);
+      
+      $('loginPanel').classList.add('hidden');
+      $('rechargePanel').classList.remove('hidden');
+      $('loginUsername').value = ''; 
+      $('loginPassword').value = ''; 
+      $('loginCaptcha').value = '';
+      $('adminLink').style.display = (u === 'GUANLI001') ? 'block' : 'none';
+      refreshCaptcha();
+      renderHistory();
+      renderAmounts();
+      showLoading(false);
+      showToast('登录成功', 'success');
+      
+    } catch(e) {
+      console.error('登录异常:', e);
+      $('loginError').textContent = '系统异常: ' + e.message;
+      showLoading(false);
+    }
+});
 
   // 事件绑定
   $('loginBtn').addEventListener('click', handleLogin);
