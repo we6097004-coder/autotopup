@@ -32,8 +32,6 @@
     .confirm-highlight{color:#c0392b;font-weight:600;}
     .confirm-btn{width:100%;padding:14px 16px;font-size:15px;font-weight:600;border:none;border-radius:30px;cursor:pointer;background:#1e4b63;color:white;}
     .confirm-btn:disabled{opacity:0.5;cursor:not-allowed;}
-
-    /* 到账弹窗 */
     .arrival-modal{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10002;backdrop-filter:blur(4px);}
     .arrival-modal.hidden{display:none;}
     .arrival-content{background:white;border-radius:28px;padding:30px 24px;max-width:320px;width:90%;text-align:center;box-shadow:0 20px 40px rgba(0,0,0,0.3);}
@@ -41,7 +39,6 @@
     .arrival-title{font-size:22px;font-weight:700;color:#27ae60;margin-bottom:8px;}
     .arrival-text{font-size:15px;color:#5c7b8c;margin-bottom:20px;}
     .arrival-btn{width:100%;padding:14px;font-size:16px;font-weight:600;border:none;border-radius:30px;cursor:pointer;background:#27ae60;color:white;}
-
     .lang-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
     .lang-switch{display:flex;gap:8px;margin-left:auto;}
     .lang-btn{background:rgba(255,255,255,0.7);border:1px solid #bdd3e0;padding:6px 12px;border-radius:30px;font-size:12px;font-weight:500;color:#1e4b63;cursor:pointer;}
@@ -96,6 +93,8 @@
     .tip-item{display:flex;gap:10px;margin-bottom:12px;font-size:13px;color:#1e4b63;}
     .tip-icon{width:20px;height:20px;background:#1e4b63;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;flex-shrink:0;}
     .qr-placeholder{background:#fff;padding:18px 10px;border-radius:26px;margin:16px 0;text-align:center;}
+    .qr-code-container{width:150px;height:150px;margin:0 auto;display:flex;align-items:center;justify-content:center;}
+    .qr-code-container img{max-width:100%;max-height:100%;object-fit:contain;}
     .qr-code-sim{width:150px;height:150px;margin:0 auto;background:repeating-linear-gradient(45deg,#000,#000 6px,#fff 6px,#fff 12px);border-radius:14px;border:3px solid #1e4b63;}
     .hidden{display:none !important;}
     .history-list{list-style:none;max-height:200px;overflow-y:auto;}
@@ -138,22 +137,13 @@
 <div class="app-container">
   <div id="loadingOverlay" class="loading-overlay hidden"><div class="loading-container"><div class="loading-spinner"></div><div class="loading-text">加载中...</div></div></div>
   <div id="toast" class="toast-message"></div>
-
-  <!-- 到账弹窗 -->
   <div id="arrivalModal" class="arrival-modal hidden">
-    <div class="arrival-content">
-      <div class="arrival-icon">🎉</div>
-      <div class="arrival-title">充值已到账</div>
-      <div class="arrival-text">您的余额已更新，感谢充值！</div>
-      <button class="arrival-btn" id="arrivalOkBtn">返回首页</button>
-    </div>
+    <div class="arrival-content"><div class="arrival-icon">🎉</div><div class="arrival-title">充值已到账</div><div class="arrival-text">您的余额已更新，感谢充值！</div><button class="arrival-btn" id="arrivalOkBtn">返回首页</button></div>
   </div>
-
   <div id="confirmModal" class="confirm-modal hidden">
     <div class="confirm-content">
-      <button class="confirm-close" onclick="document.getElementById('confirmModal').classList.add('hidden');if(window._ct)clearInterval(window._ct);">✕</button>
-      <div class="confirm-icon">⚠️</div>
-      <div class="confirm-title">重要提醒</div>
+      <button class="confirm-close" onclick="cmClose()">✕</button>
+      <div class="confirm-icon">⚠️</div><div class="confirm-title">重要提醒</div>
       <div class="confirm-warning-text">
         <p>即将跳转支付页面，请勿重复扫描二维码对同一个地址进行支付。</p>
         <p>为确保您的款项安全到账，支付前，请再次核对地址和区块链网络类型。</p>
@@ -164,20 +154,16 @@
       <button class="confirm-btn" id="confirmOkBtn" disabled>我已仔细阅读上列信息并确认订单信息无误 (3)</button>
     </div>
   </div>
-
   <div class="lang-bar">
     <button class="admin-link" id="adminLink" style="display:none;">⚙️ 管理</button>
-    <div class="lang-switch">
-      <button class="lang-btn active" data-lang="zh">中文</button>
-      <button class="lang-btn" data-lang="en">English</button>
-    </div>
+    <div class="lang-switch"><button class="lang-btn active">中文</button><button class="lang-btn">English</button></div>
   </div>
   <div class="app-title"><h1>自助充值中心</h1></div>
 
   <div id="loginPanel" class="card">
     <div class="login-avatar"><span>🔐</span></div>
-    <div class="input-group"><label>👤 账户</label><input type="text" id="loginUsername" class="input-field" placeholder="请输入账户" autocomplete="off"></div>
-    <div class="input-group"><label>🔑 密码</label><div class="password-wrapper"><input type="password" id="loginPassword" class="input-field" placeholder="请输入密码" autocomplete="off"><button type="button" class="toggle-password pw-hidden" onclick="togglePw(this)"><svg class="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line class="slash-line" x1="2" y1="2" x2="22" y2="22"/></svg></button></div></div>
+    <div class="input-group"><label>👤 账户</label><input type="text" id="loginUsername" class="input-field" placeholder="请输入账户"></div>
+    <div class="input-group"><label>🔑 密码</label><div class="password-wrapper"><input type="password" id="loginPassword" class="input-field" placeholder="请输入密码"><button type="button" class="toggle-password pw-hidden" onclick="togglePw(this)"><svg class="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line class="slash-line" x1="2" y1="2" x2="22" y2="22"/></svg></button></div></div>
     <div class="input-group"><label>🔢 验证码</label><div class="captcha-group"><input type="text" id="loginCaptcha" class="input-field" placeholder="请输入验证码" maxlength="4"><div class="captcha-display" id="captchaDisplay">A3B8</div></div></div>
     <div id="loginError" class="error-msg"></div>
     <button id="loginBtn" class="btn">登录 · 进入充值</button>
@@ -226,7 +212,8 @@
 </div>
 
 <script>
-function togglePw(btn){const i=btn.parentElement.querySelector('input');const h=i.type==='password';i.type=h?'text':'password';btn.classList.toggle('pw-hidden',!h);}
+function togglePw(btn){const i=btn.parentElement.querySelector('input');i.type=i.type==='password'?'text':'password';btn.classList.toggle('pw-hidden',i.type==='password');}
+function cmClose(){document.getElementById('confirmModal').classList.add('hidden');if(window._ct)clearInterval(window._ct);}
 
 (function(){
   const SUPABASE_URL='https://ajfijzserkpuyeadfcci.supabase.co';
@@ -255,9 +242,7 @@ function togglePw(btn){const i=btn.parentElement.querySelector('input');const h=
   ['click','keypress','scroll','mousemove','touchstart'].forEach(e=>document.addEventListener(e,()=>{if(currentUser)rs();}));
 
   function cs(){const u=localStorage.getItem('su'),t=localStorage.getItem('st');if(u&&t&&Date.now()-parseInt(t)<900000){autoLogin(u);return true;}return false;}
-  
   async function autoLogin(u){loading(true);currentUser=u;$('welcomeUser').textContent=u;const{data}=await supabase.from('accounts').select('balance').eq('username',u).limit(1);userBalance=(data&&data[0]?.balance)||0;$('balanceValue').textContent=fm(userBalance);await Promise.all([lo(),lp(),lq()]);rh();ra();$('adminLink').style.display=(u===ADMIN)?'block':'none';$('loginPanel').classList.add('hidden');$('rechargePanel').classList.remove('hidden');rs();loading(false);}
-  
   function logout(){currentUser=null;if(sessionTimer)clearTimeout(sessionTimer);if(countdownTimer)clearInterval(countdownTimer);if(orderCheckInterval)clearInterval(orderCheckInterval);localStorage.removeItem('su');localStorage.removeItem('st');['loginPanel','rechargePanel','confirmPanel','adminPanel'].forEach(id=>$(id).classList.add('hidden'));$('loginPanel').classList.remove('hidden');$('adminLink').style.display='none';rc();}
 
   const lp=async()=>{const{data}=await supabase.from('recharge_addresses').select('*');if(data){addressPool={TRC20:[],ERC20:[]};data.forEach(i=>{if(addressPool[i.network])addressPool[i.network].push(i.address);});}};
@@ -267,17 +252,29 @@ function togglePw(btn){const i=btn.parentElement.querySelector('input');const h=
   function ga(){return selectedNetwork&&addressPool[selectedNetwork]?.length?addressPool[selectedNetwork][Math.floor(Math.random()*addressPool[selectedNetwork].length)]:null;}
 
   const rh=()=>{const uo=allOrders.filter(o=>o.username===currentUser).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));$('historyList').innerHTML=uo.length?uo.slice(0,6).map(o=>{const d=new Date(o.created_at);return`<li class="history-item"><span>${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}</span><span class="history-amount">+$${fm(o.amount)}</span></li>`;}).join(''):'<li class="empty-history">暂无记录</li>';};
-  
   const ra=()=>{$('rechargeOptionsContainer').innerHTML=[30,50,100,200,500].map(a=>`<div class="recharge-item ${selectedAmount===a?'selected':''}" data-amount="${a}"><div class="recharge-amount">$${a}</div></div>`).join('');document.querySelectorAll('.recharge-item').forEach(el=>el.addEventListener('click',()=>{selectedAmount=parseFloat(el.dataset.amount);document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');$('customAmountInput').value='';}));};
 
-  const ral=()=>{$('addressManager').innerHTML=Object.entries(addressPool).map(([net,addrs])=>addrs.map(addr=>`<div class="address-item"><div class="address-network">${net}</div><div class="address-full">${addr}</div><div class="address-actions"><button class="upload-qr-btn" data-addr="${addr}">${qrCodes[addr]?'更换':'上传'}二维码</button><button class="delete-btn" data-addr="${addr}">🗑️</button>${qrCodes[addr]?' ✓':''}</div></div>`).join('')).join('');
+  // 地址管理渲染（管理员面板）
+  const ral=()=>{$('addressManager').innerHTML=Object.entries(addressPool).map(([net,addrs])=>addrs.map(addr=>`<div class="address-item"><div class="address-network">${net}</div><div class="address-full">${addr}</div><div class="address-actions"><button class="upload-qr-btn" data-addr="${addr}">${qrCodes[addr]?'更换二维码':'上传二维码'}</button><button class="delete-btn" data-addr="${addr}">🗑️</button>${qrCodes[addr]?' ✓':''}</div></div>`).join('')).join('');
     document.querySelectorAll('#addressManager .upload-qr-btn').forEach(b=>b.addEventListener('click',()=>{const i=document.createElement('input');i.type='file';i.accept='image/*';i.onchange=e=>{const f=e.target.files[0];if(f){const r=new FileReader();r.onload=async ev=>{const img=ev.target.result,addr=b.dataset.addr;const{data}=await supabase.from('qr_codes').select('*').eq('address',addr).limit(1);if(data&&data.length>0)await supabase.from('qr_codes').update({qr_image:img}).eq('address',addr);else await supabase.from('qr_codes').insert({address:addr,qr_image:img});await lq();ral();toast('二维码已保存','success');};r.readAsDataURL(f);}};i.click();}));
     document.querySelectorAll('#addressManager .delete-btn').forEach(b=>b.addEventListener('click',async()=>{if(confirm('确定删除该地址？')){await supabase.from('recharge_addresses').delete().eq('address',b.dataset.addr);await lp();ral();toast('地址已删除','success');}}));
   };
 
+  // 订单管理渲染（管理员面板）
   const rao=()=>{if(!allOrders.length){$('adminOrderList').innerHTML='<p class="empty-history">暂无订单</p>';return;}$('adminOrderList').innerHTML=allOrders.map(o=>{const d=new Date(o.created_at);return`<div class="admin-history-item"><div class="admin-history-header"><span class="admin-history-user">${o.username}</span><span class="admin-history-amount">+$${fm(o.amount)}</span></div><div style="color:#5c7b8c;margin-bottom:4px;">${o.order_id} · ${o.network}</div><div style="display:flex;justify-content:space-between;"><span class="status-badge ${o.status}">${o.status==='success'?'已到账':'待确认'}</span><div>${o.status==='pending'?`<button class="upload-qr-btn" data-order="${o.order_id}" style="background:#27ae60;margin-right:8px;">确认到账</button>`:''}<button class="delete-btn" data-order="${o.order_id}">🗑️</button></div></div></div>`;}).join('');document.querySelectorAll('[data-order]').forEach(b=>{if(b.textContent.includes('确认')){b.addEventListener('click',async()=>{const o=allOrders.find(x=>x.order_id===b.dataset.order);if(o){await supabase.from('recharge_orders').update({status:'success',confirmed_at:new Date()}).eq('order_id',o.order_id);const{data:acc}=await supabase.from('accounts').select('balance').eq('username',o.username).limit(1);const nb=((acc&&acc[0]?.balance)||0)+parseFloat(o.amount);await supabase.from('accounts').update({balance:nb}).eq('username',o.username);if(currentUser===o.username){userBalance=nb;$('balanceValue').textContent=fm(userBalance);}await lo();rao();rh();toast('订单已确认','success');}});}else{b.addEventListener('click',async()=>{await supabase.from('recharge_orders').delete().eq('order_id',b.dataset.order);await lo();rao();rh();toast('订单已删除','success');});}});};
 
+  // 账户管理渲染
   const rac=()=>{$('accountList').innerHTML=Object.entries(accountsList).map(([n,d])=>`<div class="account-item"><div class="account-info"><span class="account-name">${n}</span><span class="account-balance">余额: $${fm(d.balance)}</span></div><div class="action-cell"><button class="edit-btn" data-user="${n}">💰</button>${n!==ADMIN?`<button class="delete-btn" data-user="${n}">🗑️</button>`:'<span style="color:#999;">Admin</span>'}</div></div>`).join('');document.querySelectorAll('.edit-btn').forEach(b=>b.addEventListener('click',()=>{const nb=prompt('编辑余额: '+b.dataset.user,accountsList[b.dataset.user]?.balance||0);if(nb&&!isNaN(nb)){supabase.from('accounts').update({balance:parseFloat(nb)}).eq('username',b.dataset.user).then(()=>{la().then(()=>rac());toast('余额已更新','success');});}}));document.querySelectorAll('.delete-btn').forEach(b=>b.addEventListener('click',()=>{if(confirm('确定删除用户?')){supabase.from('accounts').delete().eq('username',b.dataset.user).then(()=>{la().then(()=>rac());toast('账户已删除','success');});}}));};
+
+  // 🔧 显示二维码（支付页面）
+  function showQR(addr) {
+    const qrImg = qrCodes[addr];
+    if (qrImg && qrImg.length > 100) {
+      $('qrCodeDisplay').innerHTML = `<img src="${qrImg}" alt="QR Code" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">`;
+    } else {
+      $('qrCodeDisplay').innerHTML = '<div class="qr-code-sim"></div>';
+    }
+  }
 
   const login=async()=>{
     const u=$('loginUsername').value.trim(),p=$('loginPassword').value,c=$('loginCaptcha').value.trim();
@@ -300,7 +297,7 @@ function togglePw(btn){const i=btn.parentElement.querySelector('input');const h=
   $('loginBtn').addEventListener('click',login);
   ['loginPassword','loginCaptcha'].forEach(id=>$(id).addEventListener('keypress',e=>{if(e.key==='Enter')login();}));
   $('logoutBtn').addEventListener('click',logout);
-  
+
   // 提交充值
   $('gotoConfirmBtn').addEventListener('click',()=>{
     const a=$('customAmountInput').value?parseFloat($('customAmountInput').value):(selectedAmount||0);
@@ -314,49 +311,27 @@ function togglePw(btn){const i=btn.parentElement.querySelector('input');const h=
     confirmTimer=setInterval(()=>{ct--;$('confirmOkBtn').textContent=`我已仔细阅读上列信息并确认订单信息无误 (${ct})`;if(ct<=0){clearInterval(confirmTimer);$('confirmOkBtn').disabled=false;$('confirmOkBtn').textContent='我已仔细阅读上列信息并确认订单信息无误';}},1000);
   });
 
-  // 确认提交 → 跳转支付页面 + 启动订单状态轮询
+  // 确认 → 支付页面 + 轮询
   $('confirmOkBtn').addEventListener('click',async()=>{
-    $('confirmModal').classList.add('hidden');if(confirmTimer)clearInterval(confirmTimer);
+    cmClose();if(confirmTimer)clearInterval(confirmTimer);
     const a=$('customAmountInput').value?parseFloat($('customAmountInput').value):(selectedAmount||0);
     currentOrderId='RC'+Date.now().toString(36).toUpperCase();$('orderIdDisplay').textContent=currentOrderId;
     currentAddress=ga();$('currentAddressDisplay').textContent=currentAddress;
     $('networkTypeLabel').textContent=selectedNetwork==='TRC20'?'TRC20 网络':'ERC20 网络';$('copyAddressBtn').disabled=false;
     $('orderInfo').textContent=`金额: $${a.toFixed(2)} · 网络: ${selectedNetwork}`;
+    // 🔧 显示二维码
+    showQR(currentAddress);
     $('rechargePanel').classList.add('hidden');$('confirmPanel').classList.remove('hidden');
-    
-    // 倒计时
     let sec=900;if(countdownTimer)clearInterval(countdownTimer);
     countdownTimer=setInterval(()=>{sec--;const m=Math.floor(sec/60),s=sec%60;$('countdownDisplay').textContent=`${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;$('countdownDisplay').style.color=sec<=300?'#c0392b':'#d35400';if(sec<=0){clearInterval(countdownTimer);toast('支付超时','warning');$('confirmPanel').classList.add('hidden');$('rechargePanel').classList.remove('hidden');if(orderCheckInterval)clearInterval(orderCheckInterval);}},1000);
-    
-    // 🔔 实时到账检测：每8秒查询一次订单状态
     if(orderCheckInterval)clearInterval(orderCheckInterval);
-    orderCheckInterval=setInterval(async()=>{
-      if(!currentOrderId){clearInterval(orderCheckInterval);return;}
-      const{data}=await supabase.from('recharge_orders').select('status').eq('order_id',currentOrderId).limit(1);
-      const od=data&&data.length>0?data[0]:null;
-      if(od&&od.status==='success'){
-        clearInterval(orderCheckInterval);clearInterval(countdownTimer);
-        // 更新余额
-        const{data:acc}=await supabase.from('accounts').select('balance').eq('username',currentUser).limit(1);
-        userBalance=(acc&&acc[0]?.balance)||0;$('balanceValue').textContent=fm(userBalance);
-        // 显示到账弹窗
-        $('arrivalModal').classList.remove('hidden');
-      }
-    },8000);
-    
+    orderCheckInterval=setInterval(async()=>{if(!currentOrderId){clearInterval(orderCheckInterval);return;}const{data}=await supabase.from('recharge_orders').select('status').eq('order_id',currentOrderId).limit(1);const od=data&&data.length>0?data[0]:null;if(od&&od.status==='success'){clearInterval(orderCheckInterval);clearInterval(countdownTimer);const{data:acc}=await supabase.from('accounts').select('balance').eq('username',currentUser).limit(1);userBalance=(acc&&acc[0]?.balance)||0;$('balanceValue').textContent=fm(userBalance);$('arrivalModal').classList.remove('hidden');}},8000);
     await supabase.from('recharge_orders').insert({order_id:currentOrderId,username:currentUser,amount:a,network:selectedNetwork,address:currentAddress,status:'pending',created_at:new Date()});
     tg(`🔔 <b>新的充值订单</b>\n用户: ${currentUser}\n金额: $${a.toFixed(2)}\n网络: ${selectedNetwork}\n订单号: ${currentOrderId}`).catch(()=>{});
     await lo();rh();
   });
 
-  // 到账弹窗 - 返回首页
-  $('arrivalOkBtn').addEventListener('click',()=>{
-    $('arrivalModal').classList.add('hidden');
-    $('confirmPanel').classList.add('hidden');
-    $('rechargePanel').classList.remove('hidden');
-    rh();
-  });
-
+  $('arrivalOkBtn').addEventListener('click',()=>{$('arrivalModal').classList.add('hidden');$('confirmPanel').classList.add('hidden');$('rechargePanel').classList.remove('hidden');rh();});
   $('resetFormBtn').addEventListener('click',()=>{selectedAmount=null;selectedNetwork=null;$('customAmountInput').value='';document.querySelectorAll('.network-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected'));});
   $('backToRechargeBtn').addEventListener('click',()=>{if(countdownTimer)clearInterval(countdownTimer);if(orderCheckInterval)clearInterval(orderCheckInterval);$('confirmPanel').classList.add('hidden');$('rechargePanel').classList.remove('hidden');});
   $('copyAddressBtn').addEventListener('click',async()=>{if(!currentAddress)return;try{await navigator.clipboard.writeText(currentAddress);toast('已复制！','success');}catch(e){toast('复制成功','success');}});
