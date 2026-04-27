@@ -340,7 +340,82 @@ document.querySelectorAll('.lang-btn').forEach(b=>b.addEventListener('click',()=
   document.querySelectorAll('.network-btn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.network-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');selectedNetwork=b.dataset.network;}));
   $('customAmountInput').addEventListener('input',()=>{if($('customAmountInput').value){document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected'));selectedAmount=null;}});
 
-  $('adminLink').addEventListener('click',async()=>{loading(true);await Promise.all([la(),lp(),lq(),lo()]);$('accountList').innerHTML=Object.entries(accountsList).map(([n,d])=>`<div class="account-item"><div class="account-info"><span class="account-name">${n}</span><span class="account-balance">${T('balanceLabel')}: $${fm(d.balance)}</span></div><div class="action-cell"><button class="edit-btn" data-user="${n}">💰</button>${n!==ADMIN?`<button class="delete-btn" data-user="${n}">🗑️</button>`:''}</div></div>`).join('');$('addressManager').innerHTML=Object.entries(addressPool).map(([net,addrs])=>addrs.map(addr=>`<div class="address-item"><div class="address-full">${net}: ${addr}</div><div class="address-actions"><button class="upload-qr-btn" data-addr="${addr}">${qrCodes[addr]?T('qrChange'):T('qrUpload')}</button><button class="delete-btn" data-addr="${addr}">🗑️</button></div></div>`).join('')).join('');$('rechargePanel').classList.add('hidden');$('adminPanel').classList.remove('hidden');loading(false);});
+  $('adminLink').addEventListener('click',async()=>{loading(true);await Promise.all([la(),lp(),lq(),lo()]);$('accountList').innerHTML=Object.entries(accountsList).map(([n,d])=>`<div class="account-item"><div class="account-info"><span class="account-name">${n}</span><span class="account-balance">${T('balanceLabel')}: $${fm(d.balance)}</span></div><div class="action-cell"><button class="edit-btn" data-user="${n}">💰</button>${n!==ADMIN?`<button class="delete-btn" data-user="${n}">🗑️</button>`:''}</div></div>`).join('');// 地址管理渲染 + 事件绑定
+$('addressManager').innerHTML = Object.entries(addressPool).map(([net, addrs]) => 
+  addrs.map(addr => `
+    <div class="address-item">
+      <div class="address-full">${net}: ${addr}</div>
+      <div class="address-actions">
+        <button class="upload-qr-btn" data-addr="${addr}">${qrCodes[addr] ? '更换二维码' : '上传二维码'}</button>
+        <button class="delete-address-btn" data-addr="${addr}">🗑️ 删除</button>
+      </div>
+    </div>
+  `).join('')
+).join('');
+
+// 绑定删除事件
+document.querySelectorAll('.delete-address-btn').forEach(btn => {
+  btn.addEventListener('click', async function() {
+    const addr = this.dataset.addr;
+    if (!confirm('确定删除该地址？\n' + addr)) return;
+    
+    loading(true);
+    const { error } = await supabase.from('recharge_addresses').delete().eq('address', addr);
+    loading(false);
+    
+    if (error) {
+      toast('删除失败: ' + error.message, 'warning');
+    } else {
+      toast('地址已删除', 'success');
+      // 重新加载地址
+      await lp();
+      // 重新渲染
+      $('addressManager').innerHTML = Object.entries(addressPool).map(([net, addrs]) => 
+        addrs.map(a => `
+          <div class="address-item">
+            <div class="address-full">${net}: ${a}</div>
+            <div class="address-actions">
+              <button class="upload-qr-btn" data-addr="${a}">${qrCodes[a] ? '更换二维码' : '上传二维码'}</button>
+              <button class="delete-address-btn" data-addr="${a}">🗑️ 删除</button>
+            </div>
+          </div>
+        `).join('')
+      ).join('');
+      // 重新绑定事件（递归调用自己）
+      bindDeleteEvents();
+    }
+  });
+});
+
+// 上传二维码事件
+document.querySelectorAll('.upload-qr-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const addr = this.dataset.addr;
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (ev) => {
+        const img = ev.target.result;
+        loading(true);
+        const { data } = await supabase.from('qr_codes').select('*').eq('address', addr).limit(1);
+        if (data && data.length > 0) {
+          await supabase.from('qr_codes').update({ qr_image: img }).eq('address', addr);
+        } else {
+          await supabase.from('qr_codes').insert({ address: addr, qr_image: img });
+        }
+        await lq();
+        loading(false);
+        toast('二维码已保存', 'success');
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  });
+});$('adminPanel').classList.remove('hidden');loading(false);});
   $('backFromAdminBtn').addEventListener('click',()=>{$('adminPanel').classList.add('hidden');$('rechargePanel').classList.remove('hidden');});
 
   rc();applyLang();ra();
