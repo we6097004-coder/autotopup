@@ -217,6 +217,7 @@ let currentLang='zh';
 const T=(k,...a)=>{const v=LANG[currentLang]?.[k];return typeof v==='function'?v(...a):(v||k);};
 function switchLang(l){currentLang=l;document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.dataset.lang===l));applyLang();}
 
+// 🔧 修复：将 ra 作为可选调用
 function applyLang(){
   const s=(id,k,h)=>{const el=document.getElementById(id);if(!el)return;if(h)el.innerHTML=T(k);else el.textContent=T(k);};
   const ph=(id,k)=>{const el=document.getElementById(id);if(el)el.placeholder=T(k);};
@@ -233,11 +234,13 @@ function applyLang(){
   s('adminPageTitle','adminPageTitle');s('accountManageTitle','accountManageTitle');
   s('addressManageTitle','addressManageTitle');s('orderManageTitle','orderManageTitle');
   s('addAccountBtn','addAccountText');s('addAddressBtn','addAddressText');s('adminLink','adminLinkText');
-  ra?.();
+  // 🔧 修复：安全调用 ra
+  if (typeof window.ra === 'function') window.ra();
 }
 
 document.querySelectorAll('.lang-btn').forEach(b=>b.addEventListener('click',()=>switchLang(b.dataset.lang)));
 
+// ========== 主程序 ==========
 (function(){
   const SUPABASE_URL='https://ajfijzserkpuyeadfcci.supabase.co';
   const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFqZmlqenNlcmtwdXllYWRmY2NpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MjY4NjcsImV4cCI6MjA5MjUwMjg2N30.3-025IkPPF3TIIanaXP152fK2sFKkwgglpEIaVc4N9k';
@@ -277,8 +280,12 @@ document.querySelectorAll('.lang-btn').forEach(b=>b.addEventListener('click',()=
   function ga(){return selectedNetwork&&addressPool[selectedNetwork]?.length?addressPool[selectedNetwork][Math.floor(Math.random()*addressPool[selectedNetwork].length)]:null;}
 
   const rh=()=>{const uo=allOrders.filter(o=>o.username===currentUser).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));$('historyList').innerHTML=uo.length?uo.slice(0,6).map(o=>{const d=new Date(o.created_at);return`<li class="history-item"><span>${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}</span><span class="history-amount">+$${fm(o.amount)}</span></li>`;}).join(''):`<li class="empty-history">${T('emptyHistory')}</li>`;};
-  
-  const ra=()=>{$('rechargeOptionsContainer').innerHTML=[30,50,100,200,500].map(a=>`<div class="recharge-item ${selectedAmount===a?'selected':''}" data-amount="${a}"><div class="recharge-amount">$${a}</div></div>`).join('');document.querySelectorAll('.recharge-item').forEach(el=>el.addEventListener('click',()=>{selectedAmount=parseFloat(el.dataset.amount);document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');$('customAmountInput').value='';}));};
+
+  // 🔧 将 ra 挂载到 window 上供外部调用
+  const ra = window.ra = () => {
+    $('rechargeOptionsContainer').innerHTML=[30,50,100,200,500].map(a=>`<div class="recharge-item ${selectedAmount===a?'selected':''}" data-amount="${a}"><div class="recharge-amount">$${a}</div></div>`).join('');
+    document.querySelectorAll('.recharge-item').forEach(el=>el.addEventListener('click',()=>{selectedAmount=parseFloat(el.dataset.amount);document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');$('customAmountInput').value='';}));
+  };
 
   function showQR(addr){const qrImg=qrCodes[addr];$('qrCodeDisplay').innerHTML=(qrImg&&qrImg.length>100)?`<img src="${qrImg}" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">`:'<div class="qr-code-sim"></div>';}
 
