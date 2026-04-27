@@ -148,7 +148,7 @@
         <p>即将跳转支付页面，请勿重复扫描二维码对同一个地址进行支付。</p>
         <p>为确保您的款项安全到账，支付前，请再次核对地址和区块链网络类型。</p>
         <p>如需再次充值，请前往充值页，创建新的订单！</p>
-        <p>请认真核对货币类型，目前只接受USDT-TRC20和USDT-ERC20进行支付。</p>
+        <p><span class="confirm-highlight">请认真核对货币类型，目前只接受USDT-TRC20和USDT-ERC20进行支付。</span></p>
         <p>如有任何疑问，请与我们联系。</p>
       </div>
       <button class="confirm-btn" id="confirmOkBtn" disabled>我已仔细阅读上列信息并确认订单信息无误 (3)</button>
@@ -183,25 +183,29 @@
   </div>
 
   <div id="confirmPanel" class="card hidden">
-    <div style="display:flex;align-items:center;margin-bottom:14px;"><button id="backToRechargeBtn" style="background:none;border:none;font-size:22px;cursor:pointer;">←</button><h2>确认充值</h2></div>
-    <div class="order-id-section"><span>📋 订单号</span><span id="orderIdDisplay">-</span></div>
-    <div class="timer-warning"><span>⏳ 剩余支付时间</span><span class="countdown-timer" id="countdownDisplay">15:00</span></div>
+    <div style="display:flex;align-items:center;margin-bottom:14px;"><button id="backToRechargeBtn" style="background:none;border:none;font-size:22px;cursor:pointer;">←</button><h2 id="confirmPageTitle">确认充值</h2></div>
+    <div class="order-id-section"><span id="orderIdLabel">📋 订单号</span><span id="orderIdDisplay">-</span></div>
+    <div class="timer-warning"><span id="timeLimitMsg">⏳ 剩余支付时间</span><span class="countdown-timer" id="countdownDisplay">15:00</span></div>
     <div style="background:#eef3f8;border-radius:20px;padding:14px;"><span id="orderInfo">金额: $0 · 网络: 未选择</span></div>
-    <div class="address-card"><div class="address-header"><span>📦 充值地址</span><span id="networkTypeLabel">网络</span></div><div class="address-value-large" id="currentAddressDisplay">-</div><button class="copy-btn" id="copyAddressBtn" disabled>📋 复制地址</button></div>
-    <div class="qr-placeholder"><div id="qrCodeDisplay" class="qr-code-container"><div class="qr-code-sim"></div></div><p>请扫描二维码或复制地址转账</p></div>
-    <div class="tips-container-bottom"><div class="tip-item"><div class="tip-icon">1</div><div>⏰ 请在15分钟内完成支付</div></div><div class="tip-item"><div class="tip-icon">2</div><div>🔄 每次充值地址随机生成</div></div><div class="tip-item"><div class="tip-icon">3</div><div>⏱️ 充值完成后，系统自动检测到账</div></div></div>
+    <div class="address-card"><div class="address-header"><span id="rechargeAddressLabel">📦 充值地址</span><span id="networkTypeLabel">网络</span></div><div class="address-value-large" id="currentAddressDisplay">-</div><button class="copy-btn" id="copyAddressBtn" disabled><span id="copyAddressText">📋 复制地址</span></button></div>
+    <div class="qr-placeholder"><div id="qrCodeDisplay" class="qr-code-container"><div class="qr-code-sim"></div></div><p id="scanTip">请扫描二维码或复制地址转账</p></div>
+    <div class="tips-container-bottom">
+      <div class="tip-item"><div class="tip-icon">1</div><div id="tip1">⏰ 请在15分钟内完成支付</div></div>
+      <div class="tip-item"><div class="tip-icon">2</div><div id="tip2">🔄 每次充值地址随机生成</div></div>
+      <div class="tip-item"><div class="tip-icon">3</div><div id="tip3">⏱️ 充值完成后，系统自动检测到账</div></div>
+    </div>
   </div>
 
   <div id="adminPanel" class="card hidden">
-    <div style="display:flex;align-items:center;margin-bottom:14px;"><button id="backFromAdminBtn" style="background:none;border:none;font-size:22px;cursor:pointer;">←</button><h2>管理员面板</h2></div>
+    <div style="display:flex;align-items:center;margin-bottom:14px;"><button id="backFromAdminBtn" style="background:none;border:none;font-size:22px;cursor:pointer;">←</button><h2 id="adminPageTitle">管理员面板</h2></div>
     <div class="admin-panel">
-      <div class="section-title">👥 账户管理</div>
-      <div style="display:flex;gap:10px;margin-bottom:16px;"><input type="text" id="newUsername" class="input-field" placeholder="用户名" style="flex:2;"><div class="password-wrapper" style="flex:2;"><input type="password" id="newPassword" class="input-field" placeholder="密码"><button type="button" class="toggle-password pw-hidden" onclick="togglePw(this)"><svg class="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line class="slash-line" x1="2" y1="2" x2="22" y2="22"/></svg></button></div><button class="btn" id="addAccountBtn" style="flex:1;padding:12px;">添加</button></div>
+      <div class="section-title" id="accountManageTitle">👥 账户管理</div>
+      <div style="display:flex;gap:10px;margin-bottom:16px;"><input type="text" id="newUsername" class="input-field" placeholder="用户名" style="flex:2;"><div class="password-wrapper" style="flex:2;"><input type="password" id="newPassword" class="input-field" placeholder="密码"><button type="button" class="toggle-password pw-hidden" onclick="togglePw(this)"><svg class="eye-icon" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/><line class="slash-line" x1="2" y1="2" x2="22" y2="22"/></svg></button></div><button class="btn" id="addAccountBtn" style="flex:1;padding:12px;"><span id="addAccountText">添加</span></button></div>
       <div id="accountList"></div>
-      <div class="section-title">📦 地址管理</div>
-      <div class="add-address-form"><select id="newAddressNetwork"><option value="TRC20">USDT-TRC20</option><option value="ERC20">USDT-ERC20</option></select><input type="text" id="newAddressValue" class="input-field" placeholder="输入新地址"><button class="btn" id="addAddressBtn" style="flex:1;padding:10px;">添加</button></div>
+      <div class="section-title" id="addressManageTitle">📦 地址管理</div>
+      <div class="add-address-form"><select id="newAddressNetwork"><option value="TRC20">USDT-TRC20</option><option value="ERC20">USDT-ERC20</option></select><input type="text" id="newAddressValue" class="input-field" placeholder="输入新地址"><button class="btn" id="addAddressBtn" style="flex:1;padding:10px;"><span id="addAddressText">添加</span></button></div>
       <div id="addressManager"></div>
-      <div class="section-title">📊 充值订单管理</div>
+      <div class="section-title" id="orderManageTitle">📊 充值订单管理</div>
       <div id="adminOrderList"></div>
     </div>
   </div>
@@ -227,6 +231,7 @@ function cmClose(){document.getElementById('confirmModal').classList.add('hidden
   let selectedAmount=null,selectedNetwork=null,currentAddress='',currentOrderId='';
   let confirmTimer=null,countdownTimer=null,sessionTimer=null,orderCheckInterval=null;
   let addressPool={TRC20:[],ERC20:[]},qrCodes={},allOrders=[],accountsList={};
+  let addrEventsBound=false; // 防止多次绑定事件
 
   function rc(){const c='ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';currentCaptcha=Array.from({length:4},()=>c[Math.floor(Math.random()*c.length)]).join('');$('captchaDisplay').textContent=currentCaptcha;}
   $('captchaDisplay').addEventListener('click',rc);
@@ -239,7 +244,7 @@ function cmClose(){document.getElementById('confirmModal').classList.add('hidden
   function checkSession(){const u=localStorage.getItem('su'),t=localStorage.getItem('st');if(u&&t&&Date.now()-parseInt(t)<900000){autoLogin(u);return true;}clearSession();return false;}
 
   async function autoLogin(u){loading(true);currentUser=u;$('welcomeUser').textContent=u;const{data}=await supabase.from('accounts').select('balance').eq('username',u).limit(1);userBalance=(data&&data[0]?.balance)||0;$('balanceValue').textContent=fm(userBalance);await Promise.all([lo(),lp(),lq()]);rh();ra();$('adminLink').style.display=(u===ADMIN)?'block':'none';$('loginPanel').classList.add('hidden');$('rechargePanel').classList.remove('hidden');resetSessionTimer();loading(false);}
-  function logout(){currentUser=null;if(sessionTimer)clearTimeout(sessionTimer);if(countdownTimer)clearInterval(countdownTimer);if(orderCheckInterval)clearInterval(orderCheckInterval);clearSession();['loginPanel','rechargePanel','confirmPanel','adminPanel'].forEach(id=>$(id).classList.add('hidden'));$('loginPanel').classList.remove('hidden');$('adminLink').style.display='none';rc();}
+  function logout(){currentUser=null;if(sessionTimer)clearTimeout(sessionTimer);if(countdownTimer)clearInterval(countdownTimer);if(orderCheckInterval)clearInterval(orderCheckInterval);clearSession();['loginPanel','rechargePanel','confirmPanel','adminPanel'].forEach(id=>$(id).classList.add('hidden'));$('loginPanel').classList.remove('hidden');$('adminLink').style.display='none';rc();addrEventsBound=false;}
 
   const lp=async()=>{const{data}=await supabase.from('recharge_addresses').select('*');if(data){addressPool={TRC20:[],ERC20:[]};data.forEach(i=>{if(addressPool[i.network])addressPool[i.network].push(i.address);});}};
   const lq=async()=>{const{data}=await supabase.from('qr_codes').select('*');if(data){qrCodes={};data.forEach(i=>{qrCodes[i.address]=i.qr_image;});}};
@@ -248,35 +253,53 @@ function cmClose(){document.getElementById('confirmModal').classList.add('hidden
   function ga(){return selectedNetwork&&addressPool[selectedNetwork]?.length?addressPool[selectedNetwork][Math.floor(Math.random()*addressPool[selectedNetwork].length)]:null;}
 
   const rh=()=>{const uo=allOrders.filter(o=>o.username===currentUser).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));$('historyList').innerHTML=uo.length?uo.slice(0,6).map(o=>{const d=new Date(o.created_at);return`<li class="history-item"><span>${d.getMonth()+1}/${d.getDate()} ${d.getHours().toString().padStart(2,'0')}:${d.getMinutes().toString().padStart(2,'0')}</span><span class="history-amount">+$${fm(o.amount)}</span></li>`;}).join(''):'<li class="empty-history">暂无记录</li>';};
-
   const ra=()=>{$('rechargeOptionsContainer').innerHTML=[30,50,100,200,500].map(a=>`<div class="recharge-item ${selectedAmount===a?'selected':''}" data-amount="${a}"><div class="recharge-amount">$${a}</div></div>`).join('');document.querySelectorAll('.recharge-item').forEach(el=>el.addEventListener('click',()=>{selectedAmount=parseFloat(el.dataset.amount);document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected'));el.classList.add('selected');$('customAmountInput').value='';}));};
-
   function showQR(addr){const qrImg=qrCodes[addr];$('qrCodeDisplay').innerHTML=(qrImg&&qrImg.length>100)?`<img src="${qrImg}" style="width:100%;height:100%;object-fit:contain;border-radius:10px;">`:'<div class="qr-code-sim"></div>';}
 
-  // ========== 地址删除事件绑定（使用事件委托，避免删除后失效） ==========
+  // ========== 地址渲染（只更新HTML，不绑定事件） ==========
+  function renderAddrHTML() {
+    $('addressManager').innerHTML = Object.entries(addressPool).map(([net, addrs]) => 
+      addrs.map(addr => `
+        <div class="address-item">
+          <div class="address-network">${net}</div>
+          <div class="address-full">${addr}</div>
+          <div class="address-actions">
+            <button class="upload-qr-btn upload-btn" data-addr="${addr}">${qrCodes[addr] ? '更换二维码' : '上传二维码'}</button>
+            <button class="delete-btn delete-addr-btn" data-addr="${addr}">🗑️</button>
+            ${qrCodes[addr] ? ' ✓' : ''}
+          </div>
+        </div>
+      `).join('')
+    ).join('');
+  }
+
+  // ========== 事件绑定（只绑定一次，使用事件委托） ==========
   function bindAddrEvents() {
-    // 使用事件委托绑定到父容器
-    $('addressManager').onclick = null; // 清除旧事件
+    if (addrEventsBound) return;
+    addrEventsBound = true;
+
     $('addressManager').addEventListener('click', async (e) => {
       const btn = e.target.closest('button');
       if (!btn) return;
-      
       const addr = btn.dataset.addr;
-      
-      // 删除按钮
+      if (!addr) return;
+
+      // 删除地址
       if (btn.classList.contains('delete-addr-btn')) {
+        e.stopPropagation();
         if (!confirm('确定删除该地址？\n' + addr)) return;
         loading(true);
         const { error } = await supabase.from('recharge_addresses').delete().eq('address', addr);
-        if (error) { toast('删除失败: ' + error.message, 'warning'); loading(false); return; }
+        if (error) { toast('删除失败', 'warning'); loading(false); return; }
         await lp();
-        renderAddrList();
+        renderAddrHTML();
         toast('地址已删除', 'success');
         loading(false);
       }
-      
-      // 上传二维码按钮
+
+      // 上传二维码
       if (btn.classList.contains('upload-btn')) {
+        e.stopPropagation();
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'image/*';
@@ -294,7 +317,7 @@ function cmClose(){document.getElementById('confirmModal').classList.add('hidden
               await supabase.from('qr_codes').insert({ address: addr, qr_image: img });
             }
             await lq();
-            renderAddrList();
+            renderAddrHTML();
             toast('二维码已保存', 'success');
             loading(false);
           };
@@ -305,21 +328,9 @@ function cmClose(){document.getElementById('confirmModal').classList.add('hidden
     });
   }
 
-  // 渲染地址列表
+  // 完整渲染地址
   function renderAddrList() {
-    $('addressManager').innerHTML = Object.entries(addressPool).map(([net, addrs]) => 
-      addrs.map(addr => `
-        <div class="address-item">
-          <div class="address-network">${net}</div>
-          <div class="address-full">${addr}</div>
-          <div class="address-actions">
-            <button class="upload-qr-btn upload-btn" data-addr="${addr}">${qrCodes[addr] ? '更换二维码' : '上传二维码'}</button>
-            <button class="delete-btn delete-addr-btn" data-addr="${addr}">🗑️</button>
-            ${qrCodes[addr] ? ' ✓' : ''}
-          </div>
-        </div>
-      `).join('')
-    ).join('');
+    renderAddrHTML();
     bindAddrEvents();
   }
 
@@ -343,7 +354,7 @@ function cmClose(){document.getElementById('confirmModal').classList.add('hidden
   $('loginBtn').addEventListener('click',login);
   ['loginPassword','loginCaptcha'].forEach(id=>$(id).addEventListener('keypress',e=>{if(e.key==='Enter')login();}));
   $('logoutBtn').addEventListener('click',logout);
-  
+
   $('gotoConfirmBtn').addEventListener('click',()=>{
     const a=$('customAmountInput').value?parseFloat($('customAmountInput').value):(selectedAmount||0);
     if(a<=0)return $('rechargeError').textContent='请选择或输入金额';if(a<20)return $('rechargeError').textContent='最低充值 $20';
@@ -353,7 +364,7 @@ function cmClose(){document.getElementById('confirmModal').classList.add('hidden
     let ct=3;if(confirmTimer)clearInterval(confirmTimer);
     confirmTimer=setInterval(()=>{ct--;$('confirmOkBtn').textContent=`我已仔细阅读上列信息并确认订单信息无误 (${ct})`;if(ct<=0){clearInterval(confirmTimer);$('confirmOkBtn').disabled=false;$('confirmOkBtn').textContent='我已仔细阅读上列信息并确认订单信息无误';}},1000);
   });
-  
+
   $('confirmOkBtn').addEventListener('click',async()=>{
     cmClose();if(confirmTimer)clearInterval(confirmTimer);
     const a=$('customAmountInput').value?parseFloat($('customAmountInput').value):(selectedAmount||0);
@@ -370,7 +381,7 @@ function cmClose(){document.getElementById('confirmModal').classList.add('hidden
     tg(`🔔 New Order\nUser: ${currentUser}\nAmount: $${a.toFixed(2)}\nNetwork: ${selectedNetwork}\nOrder: ${currentOrderId}`).catch(()=>{});
     await lo();rh();
   });
-  
+
   $('arrivalOkBtn').addEventListener('click',()=>{$('arrivalModal').classList.add('hidden');$('confirmPanel').classList.add('hidden');$('rechargePanel').classList.remove('hidden');rh();});
   $('resetFormBtn').addEventListener('click',()=>{selectedAmount=null;selectedNetwork=null;$('customAmountInput').value='';document.querySelectorAll('.network-btn').forEach(b=>b.classList.remove('active'));document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected'));});
   $('backToRechargeBtn').addEventListener('click',()=>{if(countdownTimer)clearInterval(countdownTimer);if(orderCheckInterval)clearInterval(orderCheckInterval);$('confirmPanel').classList.add('hidden');$('rechargePanel').classList.remove('hidden');});
@@ -378,110 +389,32 @@ function cmClose(){document.getElementById('confirmModal').classList.add('hidden
   document.querySelectorAll('.network-btn').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.network-btn').forEach(x=>x.classList.remove('active'));b.classList.add('active');selectedNetwork=b.dataset.network;}));
   $('customAmountInput').addEventListener('input',()=>{if($('customAmountInput').value){document.querySelectorAll('.recharge-item').forEach(e=>e.classList.remove('selected'));selectedAmount=null;}});
 
-  // 管理员面板
+  // 管理员面板入口
   $('adminLink').addEventListener('click',async()=>{
     loading(true);
-    await Promise.all([la(), lp(), lq(), lo()]);
-    // 渲染账户列表
-    $('accountList').innerHTML = Object.entries(accountsList).map(([n, d]) => `
-      <div class="account-item">
-        <div class="account-info"><span class="account-name">${n}</span><span class="account-balance">余额: $${fm(d.balance)}</span></div>
-        <div class="action-cell">
-          <button class="edit-btn" data-user="${n}">💰</button>
-          ${n !== ADMIN ? `<button class="delete-btn" data-user="${n}">🗑️</button>` : '<span>Admin</span>'}
-        </div>
-      </div>`).join('');
-    // 渲染地址列表
+    await Promise.all([la(),lp(),lq(),lo()]);
+    // 渲染账户
+    $('accountList').innerHTML=Object.entries(accountsList).map(([n,d])=>`<div class="account-item"><div class="account-info"><span class="account-name">${n}</span><span class="account-balance">余额: $${fm(d.balance)}</span></div><div class="action-cell"><button class="edit-btn" data-user="${n}">💰</button>${n!==ADMIN?`<button class="delete-btn" data-user="${n}">🗑️</button>`:''}</div></div>`).join('');
+    // 渲染地址
     renderAddrList();
-    // 渲染订单列表
-    $('adminOrderList').innerHTML = allOrders.length ? allOrders.map(o => {
-      const d = new Date(o.created_at);
-      return `<div class="admin-history-item">
-        <div class="admin-history-header"><span>${o.username}</span><span>+$${fm(o.amount)}</span></div>
-        <div style="color:#5c7b8c;">${o.order_id} · ${o.network}</div>
-        <div style="display:flex;justify-content:space-between;">
-          <span class="status-badge ${o.status}">${o.status === 'success' ? '已到账' : '待确认'}</span>
-          <div>${o.status === 'pending' ? `<button class="upload-qr-btn confirm-order-btn" data-order="${o.order_id}" style="background:#27ae60;">确认到账</button>` : ''}
-          <button class="delete-btn del-order-btn" data-order="${o.order_id}">🗑️</button></div>
-        </div>
-      </div>`;
-    }).join('') : '<p class="empty-history">暂无订单</p>';
-    
-    $('rechargePanel').classList.add('hidden');
-    $('adminPanel').classList.remove('hidden');
+    // 渲染订单
+    $('adminOrderList').innerHTML=allOrders.length?allOrders.map(o=>{const d=new Date(o.created_at);return`<div class="admin-history-item"><div class="admin-history-header"><span>${o.username}</span><span>+$${fm(o.amount)}</span></div><div style="color:#5c7b8c;">${o.order_id}·${o.network}</div><div style="display:flex;justify-content:space-between;"><span class="status-badge ${o.status}">${o.status==='success'?'已到账':'待确认'}</span><div>${o.status==='pending'?`<button class="upload-qr-btn confirm-btn2" data-order="${o.order_id}" style="background:#27ae60;">确认到账</button>`:''}<button class="delete-btn del-btn2" data-order="${o.order_id}">🗑️</button></div></div></div>`;}).join(''):'<p class="empty-history">暂无订单</p>';
+    $('rechargePanel').classList.add('hidden');$('adminPanel').classList.remove('hidden');
     loading(false);
   });
-  
-  $('backFromAdminBtn').addEventListener('click', () => { $('adminPanel').classList.add('hidden'); $('rechargePanel').classList.remove('hidden'); });
-  $('addAccountBtn').addEventListener('click', async () => {
-    const u = $('newUsername').value.trim(), p = $('newPassword').value;
-    if (!u || !p) return toast('请输入用户名和密码', 'warning');
-    const hp = await sha256(p);
-    const { error } = await supabase.from('accounts').insert({ username: u, password: hp, balance: 0 });
-    if (error) return toast('添加失败', 'warning');
-    $('newUsername').value = ''; $('newPassword').value = '';
-    toast('账户已添加', 'success');
-    await la();
-    $('adminLink').click(); // 刷新列表
-  });
-  $('addAddressBtn').addEventListener('click', async () => {
-    const net = $('newAddressNetwork').value, addr = $('newAddressValue').value.trim();
-    if (!addr) return toast('请输入地址', 'warning');
-    const { error } = await supabase.from('recharge_addresses').insert({ network: net, address: addr });
-    if (error) return toast('添加失败: ' + error.message, 'warning');
-    $('newAddressValue').value = '';
-    toast('地址已添加', 'success');
-    await lp();
-    renderAddrList();
-  });
 
-  // 使用事件委托处理账户编辑/删除和订单确认/删除
-  $('accountList').addEventListener('click', async (e) => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    const user = btn.dataset.user;
-    if (btn.classList.contains('edit-btn')) {
-      const nb = prompt('编辑余额: ' + user, accountsList[user]?.balance || 0);
-      if (nb && !isNaN(nb)) {
-        await supabase.from('accounts').update({ balance: parseFloat(nb) }).eq('username', user);
-        toast('余额已更新', 'success');
-        $('adminLink').click();
-      }
-    }
-    if (btn.classList.contains('delete-btn')) {
-      if (confirm('确定删除用户 ' + user + '?')) {
-        await supabase.from('accounts').delete().eq('username', user);
-        toast('账户已删除', 'success');
-        $('adminLink').click();
-      }
-    }
-  });
+  $('backFromAdminBtn').addEventListener('click',()=>{$('adminPanel').classList.add('hidden');$('rechargePanel').classList.remove('hidden');});
+  $('addAccountBtn').addEventListener('click',async()=>{const u=$('newUsername').value.trim(),p=$('newPassword').value;if(!u||!p)return toast('请输入用户名和密码','warning');const hp=await sha256(p);const{error}=await supabase.from('accounts').insert({username:u,password:hp,balance:0});if(error)return toast('添加失败','warning');$('newUsername').value='';$('newPassword').value='';toast('账户已添加','success');await la();$('adminLink').click();});
+  $('addAddressBtn').addEventListener('click',async()=>{const net=$('newAddressNetwork').value,addr=$('newAddressValue').value.trim();if(!addr)return toast('请输入地址','warning');const{error}=await supabase.from('recharge_addresses').insert({network:net,address:addr});if(error)return toast('添加失败','warning');$('newAddressValue').value='';toast('地址已添加','success');await lp();renderAddrList();});
 
-  $('adminOrderList').addEventListener('click', async (e) => {
-    const btn = e.target.closest('button');
-    if (!btn) return;
-    const oid = btn.dataset.order;
-    if (btn.classList.contains('confirm-order-btn')) {
-      const o = allOrders.find(x => x.order_id === oid);
-      if (o) {
-        await supabase.from('recharge_orders').update({ status: 'success', confirmed_at: new Date() }).eq('order_id', oid);
-        const { data: acc } = await supabase.from('accounts').select('balance').eq('username', o.username).limit(1);
-        const nb = ((acc && acc[0]?.balance) || 0) + parseFloat(o.amount);
-        await supabase.from('accounts').update({ balance: nb }).eq('username', o.username);
-        if (currentUser === o.username) { userBalance = nb; $('balanceValue').textContent = fm(userBalance); }
-        toast('订单已确认', 'success');
-        $('adminLink').click();
-      }
-    }
-    if (btn.classList.contains('del-order-btn')) {
-      await supabase.from('recharge_orders').delete().eq('order_id', oid);
-      toast('订单已删除', 'success');
-      $('adminLink').click();
-    }
-  });
+  // 事件委托：账户管理
+  $('accountList').addEventListener('click',async(e)=>{const btn=e.target.closest('button');if(!btn)return;const u=btn.dataset.user;if(btn.classList.contains('edit-btn')){const nb=prompt('编辑余额: '+u,accountsList[u]?.balance||0);if(nb&&!isNaN(nb)){await supabase.from('accounts').update({balance:parseFloat(nb)}).eq('username',u);toast('余额已更新','success');$('adminLink').click();}}if(btn.classList.contains('delete-btn')){if(confirm('确定删除用户?')){await supabase.from('accounts').delete().eq('username',u);toast('账户已删除','success');$('adminLink').click();}}});
+
+  // 事件委托：订单管理
+  $('adminOrderList').addEventListener('click',async(e)=>{const btn=e.target.closest('button');if(!btn)return;const oid=btn.dataset.order;if(btn.classList.contains('confirm-btn2')){const o=allOrders.find(x=>x.order_id===oid);if(o){await supabase.from('recharge_orders').update({status:'success',confirmed_at:new Date()}).eq('order_id',oid);const{data:acc}=await supabase.from('accounts').select('balance').eq('username',o.username).limit(1);const nb=((acc&&acc[0]?.balance)||0)+parseFloat(o.amount);await supabase.from('accounts').update({balance:nb}).eq('username',o.username);if(currentUser===o.username){userBalance=nb;$('balanceValue').textContent=fm(userBalance);}toast('订单已确认','success');$('adminLink').click();}}if(btn.classList.contains('del-btn2')){await supabase.from('recharge_orders').delete().eq('order_id',oid);toast('订单已删除','success');$('adminLink').click();}});
 
   rc();ra();
-  if (!checkSession()) { lp().catch(() => {}); lq().catch(() => {}); }
+  if(!checkSession()){lp().catch(()=>{});lq().catch(()=>{});}
 })();
 </script>
 </body>
